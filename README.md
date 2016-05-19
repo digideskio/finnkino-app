@@ -30,7 +30,7 @@ Fill in the below template for your entry
 
 ## Technologies used
 Angular 2
-
+=======
 
 ## Link to live demo
 Contest entries need to be hosted online and be accessible at least through the judging period (May 31 – June 5).
