@@ -1,0 +1,141 @@
+<link rel="import" href="../bower_components/polymer/polymer.html">
+<link rel="import" href="../bower_components/iron-ajax/iron-ajax.html">
+<link rel="import" href="../bower_components/iron-list/iron-list.html">
+<link rel="import" href="../bower_components/paper-input/paper-input.html">
+
+<dom-module id="movie-theaters">
+
+  <template>
+
+    <style is="custom-style">
+      :host {
+        display: block;
+        padding: 10px;
+      }
+      iron-list {
+        padding-bottom: 16px;
+      }
+      .item {
+        @apply(--layout-horizontal);
+        padding: 20px;
+        border-radius: 8px;
+        background-color: white;
+        border: 1px solid #ddd;
+        max-width: 800px;
+        margin: 16px auto 0;
+      }
+      .item:focus {
+        outline: 0;
+        border-color: #333;
+      }
+      .pad {
+        padding: 0 16px;
+        @apply(--layout-flex);
+        @apply(--layout-vertical);
+      }
+      .primary {
+        font-size: 16px;
+        font-weight: bold;
+      }
+      .spacer {
+        @apply(--layout-flex);
+      }
+
+      paper-input {
+        --paper-input-container-focus-color: var(--app-primary-color);
+      }
+
+    </style>
+
+    <!--<template is="dom-bind">-->
+    <iron-ajax url="http://www.finnkino.fi/xml/TheatreAreas/" last-response="{{xmlData}}" auto handle-as="xml" id="ajax"></iron-ajax>
+    <!-- iron-list using the document scroll -->
+    <paper-input label="Filter theathers" value="{{filterValue}}" on-keyup="filterList"></paper-input>
+    <iron-list items="[[filteredTheatres]]" as="item" id="ironList">
+      <template>
+        <div>
+          <div class="item" tabindex$="[[tabIndex]]">
+            <div class="pad">
+              <div class="primary">[[item.Name]]</div>
+            </div>
+          </div>
+        </div>
+      </template>
+    </iron-list>
+
+  </template>
+
+  <script>
+
+    Polymer({
+
+      is: 'movie-theaters',
+
+      properties: {
+        xmlData: {},
+        theatres: {},
+        filteredTheatres: {},
+        filterValue: {
+          type: String
+        }
+      },
+
+      attached: function () {
+        this.$.ajax.addEventListener('response', function () {
+          this.theatres = this.filteredTheatres = this.xml2json(this.xmlData).TheatreAreas.TheatreArea;
+          this.$.ironList.notifyResize()
+        }.bind(this));
+      },
+
+      filterList: function() {
+        if (this.filterValue.trim() == '') {
+          this.setFilteredTheathers(this.theatres);
+        } else {
+          var filteredList = [];
+          this.theatres.forEach(function(value) {
+            if (value.Name.toLowerCase().indexOf(this.filterValue.toLowerCase()) > -1) {
+              filteredList.push(value);
+            }
+          }.bind(this));
+          this.setFilteredTheathers(filteredList);
+        }
+
+      },
+
+      setFilteredTheathers: function(theatres) {
+        this.filteredTheatres = theatres;
+      },
+
+      xml2json: function (xml) {
+        try {
+          var obj = {};
+          if (xml.children.length > 0) {
+            for (var i = 0; i < xml.children.length; i++) {
+              var item = xml.children.item(i);
+              var nodeName = item.nodeName;
+
+              if (typeof(obj[nodeName]) == "undefined") {
+                obj[nodeName] = this.xml2json(item);
+              } else {
+                if (typeof(obj[nodeName].push) == "undefined") {
+                  var old = obj[nodeName];
+
+                  obj[nodeName] = [];
+                  obj[nodeName].push(old);
+                }
+                obj[nodeName].push(this.xml2json(item));
+              }
+            }
+          } else {
+            obj = xml.textContent;
+          }
+          return obj;
+        } catch (e) {
+          console.log(e.message);
+        }
+      }
+
+    });
+  </script>
+
+</dom-module>

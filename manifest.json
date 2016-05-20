@@ -1,6 +1,6 @@
 {
-  "name": "My App",
-  "short_name": "My App",
+  "name": "Finnkino Movies",
+  "short_name": "Finnkino Movies",
     "icons": [{
       "src": "images/app-icon-32.png",
       "type": "image/png",
