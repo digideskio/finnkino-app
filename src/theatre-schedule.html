@@ -3,7 +3,7 @@
 <link rel="import" href="../bower_components/iron-list/iron-list.html">
 <link rel="import" href="../bower_components/paper-input/paper-input.html">
 
-<dom-module id="movie-theaters">
+<dom-module id="theatre-schedule">
 
   <template>
 
@@ -54,20 +54,30 @@
         max-width: 840px;
         margin: 0 auto 0;
       }
+
+      .more {
+        display: none;
+      }
+
+      .item.expanded .more {
+        display: block;
+      }
+
+
     </style>
 
-    <iron-ajax url="http://www.finnkino.fi/xml/TheatreAreas/" last-response="{{xmlData}}" auto handle-as="xml" id="ajax"></iron-ajax>
-    <paper-input label="Filter theathers" value="{{filterValue}}" on-keyup="filterList"></paper-input>
-    <iron-list items="[[filteredTheatres]]" as="item" id="ironList">
+
+    <iron-ajax url="http://www.finnkino.fi/xml/Schedule/" last-response="{{xmlData}}" auto handle-as="xml" id="ajax" params="{{getParameters}}"></iron-ajax>
+
+    <iron-list items="[[filteredShows]]" as="item" id="ironList" selection-enabled multi-selection>
       <template>
         <div>
-          <a href="/theatre-schedule/[[item.ID]]">
-            <div class="item" tabindex$="[[tabIndex]]">
-              <div class="pad">
-                <div class="primary">[[item.Name]]</div>
-              </div>
+          <div class$="[[getClassForItem(item, selected)]]" tabindex$="[[tabIndex]]">
+            <div class="pad">
+              <div class="primary">[[item.OriginalTitle]]</div>
+              <div class="more">sadsdadsadsa</div>
             </div>
-          </a>
+          </div>
         </div>
       </template>
     </iron-list>
@@ -77,41 +87,50 @@
   <script>
     Polymer({
 
-      is: 'movie-theaters',
+      is: 'theatre-schedule',
 
       properties: {
-        xmlData: {},
-        theatres: {},
-        filteredTheatres: {},
-        filterValue: {
+        theatreId: {
           type: String
+        },
+        xmlData: {
+          observer: 'xmlDataChanged'
+        },
+        getParameters: {
+          type: Object
+        },
+        routeData: {
+          type: Object,
+          observer: 'routeChanged'
+        },
+        shows: {
+          type: Object
+        },
+        filteredShows: {
+          type: Object
         }
       },
 
-      attached: function() {
-        this.$.ajax.addEventListener('response', function() {
-          this.theatres = this.filteredTheatres = this.xml2json(this.xmlData).TheatreAreas.TheatreArea;
-          this.$.ironList.notifyResize();
-        }.bind(this));
-      },
-
-      filterList: function() {
-        if (this.filterValue.trim() == '') {
-          this.setFilteredTheathers(this.theatres);
-        } else {
-          var filteredList = [];
-          this.theatres.forEach(function(value) {
-            if (value.Name.toLowerCase().indexOf(this.filterValue.toLowerCase()) > -1) {
-              filteredList.push(value);
-            }
-          }.bind(this));
-          this.setFilteredTheathers(filteredList);
+      routeChanged: function() {
+        if (this.routeData.prefix === '/theatre-schedule' && this.routeData.path !== '') {
+          this.theatreId = this.routeData.path.substring(1);
+          this.fetchSchedule()
         }
-
       },
 
-      setFilteredTheathers: function(theatres) {
-        this.filteredTheatres = theatres;
+      fetchSchedule: function() {
+        this.getParameters = {
+          area: this.theatreId
+        }
+      },
+
+      xmlDataChanged: function() {
+        this.filteredShows = this.shows = this.xml2json(this.xmlData).Schedule.Shows.Show;
+        this.$.ironList.notifyResize();
+      },
+
+      getClassForItem: function(item, selected) {
+          return selected ? 'item expanded' : 'item';
       },
 
       xml2json: function(xml) {
