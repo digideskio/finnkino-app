@@ -56,7 +56,7 @@
       }
     </style>
 
-    <iron-ajax url="http://www.finnkino.fi/xml/TheatreAreas/" last-response="{{xmlData}}" auto handle-as="xml" id="ajax"></iron-ajax>
+    <iron-ajax url="https://www.finnkino.fi/xml/TheatreAreas/" last-response="{{xmlData}}" auto handle-as="xml" id="ajax"></iron-ajax>
     <paper-input label="Filter theathers" value="{{filterValue}}" on-keyup="filterList"></paper-input>
     <iron-list items="[[filteredTheatres]]" as="item" id="ironList">
       <template>

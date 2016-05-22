@@ -96,7 +96,7 @@
     </style>
 
 
-    <iron-ajax url="http://www.finnkino.fi/xml/Schedule/" last-response="{{xmlData}}" auto handle-as="xml" id="ajax" params="{{getParameters}}"></iron-ajax>
+    <iron-ajax url="https://www.finnkino.fi/xml/Schedule/" last-response="{{xmlData}}" auto handle-as="xml" id="ajax" params="{{getParameters}}"></iron-ajax>
     <paper-progress indeterminate class$="[[showLoading(scheduleFetched)]]"></paper-progress>
     <paper-input label="Filter shows" value="{{filterValue}}" on-keyup="filterList"></paper-input>
     <iron-list items="[[filteredShows]]" as="item" id="ironList" selection-enabled multi-selection>
