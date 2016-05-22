@@ -49,6 +49,13 @@
       .drawer-list a.subroute {
         padding-left: 32px;
       }
+      .inherit {
+        color: inherit;
+        background-color: inherit;
+      }
+      .hide {
+        display: none;
+      }
 
 
     </style>
@@ -63,7 +70,7 @@
     <app-drawer-layout fullbleed>
 
       <!-- Drawer content -->
-      <app-drawer>
+      <app-drawer style="display: none;"> <!-- Todo show after know what to do with drawer -->
         <app-toolbar>Menu</app-toolbar>
         <iron-selector selected="[[page]]" attr-for-selected="name" class="drawer-list" role="navigation">
           <a name="movie-theaters" href="/movie-theaters">Theaters</a>
@@ -75,7 +82,8 @@
 
         <app-header condenses reveals effects="waterfall">
           <app-toolbar>
-            <paper-icon-button icon="menu" drawer-toggle></paper-icon-button>
+            <paper-icon-button icon="menu" drawer-toggle style="display:none;"></paper-icon-button> <!-- Todo show after know what to do with drawer -->
+            <a href="/" class$="[[_showBackIcon(showBackIcon)]]"><paper-icon-button icon="arrow-back"></paper-icon-button></a>
             <div title>Finnkino Movies</div>
           </app-toolbar>
         </app-header>
@@ -105,6 +113,11 @@
           observer: '_pageChanged'
         },
 
+        showBackIcon: {
+          type: Boolean,
+          value: false
+        }
+
       },
 
       observers: [
@@ -117,8 +130,15 @@
 
       _pageChanged: function(page) {
         // load page import on demand.
+        console.log(page);
         this.importHref(
           this.resolveUrl(page + '.html'), null, null, true);
+
+        this.showBackIcon = (page === 'movie-theaters')
+      },
+
+      _showBackIcon: function(showBackIcon) {
+        return showBackIcon ? 'hide inherit' : 'inherit';
       }
 
     });

@@ -1,6 +1,11 @@
 <link rel="import" href="../bower_components/polymer/polymer.html">
 <link rel="import" href="../bower_components/iron-ajax/iron-ajax.html">
 <link rel="import" href="../bower_components/iron-list/iron-list.html">
+<link rel="import" href="../bower_components/paper-button/paper-button.html">
+<link rel="import" href="../bower_components/paper-input/paper-input.html">
+<link rel="import" href="../bower_components/paper-fab/paper-fab.html">
+<link rel="import" href="../bower_components/paper-progress/paper-progress.html">
+<link rel="import" href="../bower_components/iron-icons/iron-icons.html">
 <link rel="import" href="../bower_components/paper-input/paper-input.html">
 
 <dom-module id="theatre-schedule">
@@ -63,19 +68,51 @@
         display: block;
       }
 
+      .more-icon {
+        display: inline-block;
+        float: right;
+        --paper-fab-background: var(--app-primary-color);
+      }
 
+      .inherit {
+        color: inherit;
+        background-color: inherit;
+      }
+
+      paper-progress {
+        --paper-progress-active-color: var(--app-primary-color);
+        width: 100%;
+      }
+
+      .hide {
+        display: none;
+      }
+
+      .buy-icon {
+        display: inline-block;
+        float: right;
+        --paper-fab-background: var(--paper-green-500);
+      }
     </style>
 
 
     <iron-ajax url="http://www.finnkino.fi/xml/Schedule/" last-response="{{xmlData}}" auto handle-as="xml" id="ajax" params="{{getParameters}}"></iron-ajax>
-
+    <paper-progress indeterminate class$="[[showLoading(scheduleFetched)]]"></paper-progress>
+    <paper-input label="Filter shows" value="{{filterValue}}" on-keyup="filterList"></paper-input>
     <iron-list items="[[filteredShows]]" as="item" id="ironList" selection-enabled multi-selection>
       <template>
         <div>
           <div class$="[[getClassForItem(item, selected)]]" tabindex$="[[tabIndex]]">
             <div class="pad">
-              <div class="primary">[[item.OriginalTitle]]</div>
-              <div class="more">sadsdadsadsa</div>
+              <div class="primary">
+                [[getTimeForItem(item.dttmShowStartUTC)]] [[item.OriginalTitle]]
+                <paper-fab mini icon="[[getIconForItem(item, selected)]]" title="heart" class="more-icon"></paper-fab>
+              </div>
+              <div class="more">
+                <a href="[[item.ShowURL]]" class="inherit">
+                  <paper-fab mini icon="add-shopping-cart" title="heart" class="buy-icon"></paper-fab>
+                </a>
+              </div>
             </div>
           </div>
         </div>
@@ -108,14 +145,47 @@
         },
         filteredShows: {
           type: Object
+        },
+        scheduleFetched: {
+          type: Boolean,
+          value: false
         }
       },
 
       routeChanged: function() {
         if (this.routeData.prefix === '/theatre-schedule' && this.routeData.path !== '') {
           this.theatreId = this.routeData.path.substring(1);
-          this.fetchSchedule()
+          this.scheduleFetched = false;
+          this.clearSchedule();
+          this.fetchSchedule();
         }
+      },
+
+      showLoading: function(scheduleFetched) {
+        return scheduleFetched ? 'hide' : '';
+      },
+
+      filterList: function() {
+        if (this.filterValue.trim() == '') {
+          this.setFilteredShows(this.shows);
+        } else {
+          var filteredList = [];
+          this.shows.forEach(function(value) {
+            if (value.OriginalTitle.toLowerCase().indexOf(this.filterValue.toLowerCase()) > -1) {
+              filteredList.push(value);
+            }
+          }.bind(this));
+          this.setFilteredShows(filteredList);
+        }
+      },
+
+      setFilteredShows(shows) {
+        this.filteredShows = shows;
+      },
+
+      clearSchedule: function() {
+        this.filteredShows = this.shows = [];
+        this.$.ironList.notifyResize();
       },
 
       fetchSchedule: function() {
@@ -125,12 +195,45 @@
       },
 
       xmlDataChanged: function() {
-        this.filteredShows = this.shows = this.xml2json(this.xmlData).Schedule.Shows.Show;
+        var shows = this.xml2json(this.xmlData).Schedule.Shows.Show;
+        this.filteredShows = this.shows = this.filterFutureShows(shows);
         this.$.ironList.notifyResize();
+        setTimeout(function() {
+          this.scheduleFetched = true;
+        }.bind(this), 1);
+      },
+
+      filterFutureShows: function(shows) {
+        var now = new Date();
+        var filteredShows = [];
+        shows.forEach(function(value){
+          var showTime = new Date (value.dttmShowStartUTC);
+          if (showTime.getTime()  > now.getTime()) {
+            filteredShows.push(value);
+          }
+        });
+        return filteredShows;
       },
 
       getClassForItem: function(item, selected) {
-          return selected ? 'item expanded' : 'item';
+        return selected ? 'item expanded' : 'item';
+      },
+
+      getIconForItem: function(item, selected) {
+        return selected ? 'expand-less' : 'expand-more';
+      },
+
+      getTimeForItem: function(dttmShowStartUTC) {
+        var date = new Date(dttmShowStartUTC);
+        return date.getHours() + ':' + (('' + date.getMinutes()).length === 1 ? date.getMinutes() + '0' : date.getMinutes());
+      },
+
+      expandMore: function() {
+
+      },
+
+      expandLess: function() {
+
       },
 
       xml2json: function(xml) {
