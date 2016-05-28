@@ -2,6 +2,7 @@
 <link rel="import" href="../bower_components/iron-ajax/iron-ajax.html">
 <link rel="import" href="../bower_components/iron-list/iron-list.html">
 <link rel="import" href="../bower_components/paper-input/paper-input.html">
+<link rel="import" href="../bower_components/paper-progress/paper-progress.html">
 
 <dom-module id="movie-theaters">
 
@@ -54,9 +55,19 @@
         max-width: 840px;
         margin: 0 auto 0;
       }
+
+      paper-progress {
+        --paper-progress-active-color: var(--app-primary-color);
+        width: 100%;
+      }
+
+      .hide {
+        display: none;
+      }
     </style>
 
     <iron-ajax url="https://www.finnkino.fi/xml/TheatreAreas/" last-response="{{xmlData}}" auto handle-as="xml" id="ajax"></iron-ajax>
+    <paper-progress indeterminate class$="[[showLoading(theatresFetched)]]"></paper-progress>
     <paper-input label="Filter theathers" value="{{filterValue}}" on-keyup="filterList"></paper-input>
     <iron-list items="[[filteredTheatres]]" as="item" id="ironList">
       <template>
@@ -85,6 +96,10 @@
         filteredTheatres: {},
         filterValue: {
           type: String
+        },
+        theatresFetched: {
+          type: Boolean,
+          value: false
         }
       },
 
@@ -92,6 +107,7 @@
         this.$.ajax.addEventListener('response', function() {
           this.theatres = this.filteredTheatres = this.xml2json(this.xmlData).TheatreAreas.TheatreArea;
           this.$.ironList.notifyResize();
+          this.theatresFetched = true;
         }.bind(this));
       },
 
@@ -141,7 +157,11 @@
         } catch (e) {
           console.log(e.message);
         }
-      }
+      },
+
+      showLoading: function(theatresFetched) {
+        return theatresFetched ? 'hide' : '';
+      },
 
     });
   </script>
