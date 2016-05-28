@@ -8,6 +8,10 @@
 <link rel="import" href="../bower_components/app-layout/app-header-layout/app-header-layout.html">
 <link rel="import" href="../bower_components/app-layout/app-toolbar/app-toolbar.html">
 <link rel="import" href="../bower_components/paper-icon-button/paper-icon-button.html">
+<link rel="import" href="../bower_components/paper-toast/paper-toast.html">
+<link rel="import" href="../bower_components/paper-button/paper-button.html">
+<link rel="import" href="../bower_components/iron-icons/iron-icons.html">
+<link rel="import" href="../bower_components/iron-icon/iron-icon.html">
 <link rel="import" href="../bower_components/iron-pages/iron-pages.html">
 <link rel="import" href="../bower_components/iron-selector/iron-selector.html">
 
@@ -59,6 +63,10 @@
       .title {
         color: white;
       }
+      .close-toast-button {
+    text-transform: none;
+    color: var(--app-primary-color);;
+  }
 
 
     </style>
@@ -88,7 +96,9 @@
             <paper-icon-button icon="menu" drawer-toggle style="display:none;"></paper-icon-button> <!-- Todo show after know what to do with drawer -->
             <a href="/" class$="[[_showBackIcon(showBackIcon)]]"><paper-icon-button icon="arrow-back"></paper-icon-button></a>
             <div title class="title">Finnkino Movies</div>
-            <a href="https://github.com/samiheikki/finnkino-app"><paper-icon-button src="/images/Octocat.png"></paper-icon-button></a>
+            <paper-icon-button icon="icons:filter-list"></paper-icon-button>
+            <paper-icon-button src="/images/Octocat.png" on-tap="_openGithub"></paper-icon-button>
+
           </app-toolbar>
         </app-header>
 
@@ -100,6 +110,9 @@
       </app-header-layout>
 
     </app-drawer-layout>
+    <paper-toast id="githubToast" text="[[githubMsg]]">
+      <paper-button on-tap="_cancelGithub" class="close-toast-button">Cancel</paper-button>
+    </paper-toast>
 
   </template>
 
@@ -120,6 +133,20 @@
         showBackIcon: {
           type: Boolean,
           value: false
+        },
+
+        githubMsg: {
+          type: String
+        },
+
+        moveToGithub: {
+          type: Boolean,
+          value: true
+        },
+
+        githubUrl: {
+          type: String,
+          value: 'https://github.com/samiheikki/finnkino-app'
         }
 
       },
@@ -143,6 +170,29 @@
 
       _showBackIcon: function(showBackIcon) {
         return showBackIcon ? 'hide inherit' : 'inherit';
+      },
+
+      _openGithub: function() {
+        this.githubMsg = 'Moving to Github in 3';
+        this.$.githubToast.open();
+        var second = 2;
+        var moveInterval = setInterval(function(){
+          if (second === 0) {
+            clearInterval(moveInterval);
+            if (this.moveToGithub) {
+              window.location.href = this.githubUrl;
+            }
+            this.moveToGithub = true;
+          } else {
+            this.githubMsg = 'Moving to Github in ' + second;
+          }
+          second--;
+        }.bind(this), 1000);
+      },
+
+      _cancelGithub: function () {
+        this.$.githubToast.close();
+        this.moveToGithub = false;
       }
 
     });
