@@ -10,7 +10,6 @@
 <link rel="import" href="../bower_components/paper-icon-button/paper-icon-button.html">
 <link rel="import" href="../bower_components/iron-pages/iron-pages.html">
 <link rel="import" href="../bower_components/iron-selector/iron-selector.html">
-<link rel="import" href="my-icons.html">
 
 <dom-module id="my-app">
 
@@ -30,6 +29,7 @@
       }
       app-header paper-icon-button {
         --paper-icon-button-ink-color: white;
+        color: white;
       }
 
       .drawer-list {
@@ -88,6 +88,7 @@
             <paper-icon-button icon="menu" drawer-toggle style="display:none;"></paper-icon-button> <!-- Todo show after know what to do with drawer -->
             <a href="/" class$="[[_showBackIcon(showBackIcon)]]"><paper-icon-button icon="arrow-back"></paper-icon-button></a>
             <div title class="title">Finnkino Movies</div>
+            <a href="https://github.com/samiheikki/finnkino-app"><paper-icon-button src="/images/Octocat.png"></paper-icon-button></a>
           </app-toolbar>
         </app-header>
 
