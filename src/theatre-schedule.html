@@ -93,12 +93,26 @@
         float: right;
         --paper-fab-background: var(--paper-green-500);
       }
+
+      .filters {
+        max-height: 100px;
+        transition-property: all;
+        transition-duration: .5s;
+        transition-timing-function: cubic-bezier(0, 1, 0.5, 1);
+        overflow-y: hidden;
+      }
+
+      .filters.closed {
+        max-height: 0;
+      }
     </style>
 
 
     <iron-ajax url="https://www.finnkino.fi/xml/Schedule/" last-response="{{xmlData}}" auto handle-as="xml" id="ajax" params="{{getParameters}}"></iron-ajax>
     <paper-progress indeterminate class$="[[showLoading(scheduleFetched)]]"></paper-progress>
-    <paper-input label="Filter shows" value="{{filterValue}}" on-keyup="filterList"></paper-input>
+    <div id="filters" class$="[[showFilterClass(showFilters)]]">
+      <paper-input label="Filter shows" value="{{filterValue}}" on-keyup="filterList"></paper-input>
+    </div>
     <iron-list items="[[filteredShows]]" as="item" id="ironList" selection-enabled multi-selection>
       <template>
         <div>
@@ -149,6 +163,14 @@
         scheduleFetched: {
           type: Boolean,
           value: false
+        },
+        filterTapped: {
+          type: Boolean,
+          observer: 'filterTapObserver'
+        },
+        showFilters: {
+          type: Boolean,
+          value: true
         }
       },
 
@@ -234,6 +256,17 @@
 
       expandLess: function() {
 
+      },
+
+      filterTapObserver: function() {
+        this.showFilters = !this.showFilters;
+        if (this.showFilters) {
+          //TODO SCROLL TO TOP
+        }
+      },
+
+      showFilterClass: function(showFilters) {
+        return showFilters ? 'filters closed' : 'filters';
       },
 
       xml2json: function(xml) {

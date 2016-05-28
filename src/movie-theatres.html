@@ -4,7 +4,7 @@
 <link rel="import" href="../bower_components/paper-input/paper-input.html">
 <link rel="import" href="../bower_components/paper-progress/paper-progress.html">
 
-<dom-module id="movie-theaters">
+<dom-module id="movie-theatres">
 
   <template>
 
@@ -64,11 +64,25 @@
       .hide {
         display: none;
       }
+
+      .filters {
+        max-height: 100px;
+        transition-property: all;
+        transition-duration: .5s;
+        transition-timing-function: cubic-bezier(0, 1, 0.5, 1);
+        overflow-y: hidden;
+      }
+
+      .filters.closed {
+        max-height: 0;
+      }
     </style>
 
     <iron-ajax url="https://www.finnkino.fi/xml/TheatreAreas/" last-response="{{xmlData}}" auto handle-as="xml" id="ajax"></iron-ajax>
     <paper-progress indeterminate class$="[[showLoading(theatresFetched)]]"></paper-progress>
-    <paper-input label="Filter theathers" value="{{filterValue}}" on-keyup="filterList"></paper-input>
+    <div id="filters" class$="[[showFilterClass(showFilters)]]">
+      <paper-input label="Filter theatres" value="{{filterValue}}" on-keyup="filterList"></paper-input>
+    </div>
     <iron-list items="[[filteredTheatres]]" as="item" id="ironList">
       <template>
         <div>
@@ -88,7 +102,7 @@
   <script>
     Polymer({
 
-      is: 'movie-theaters',
+      is: 'movie-theatres',
 
       properties: {
         xmlData: {},
@@ -100,13 +114,21 @@
         theatresFetched: {
           type: Boolean,
           value: false
+        },
+        filterTapped: {
+          type: Boolean,
+          observer: 'filterTapObserver'
+        },
+        showFilters: {
+          type: Boolean,
+          value: true
         }
       },
 
       attached: function() {
         this.$.ajax.addEventListener('response', function() {
           var theatres = this.xml2json(this.xmlData).TheatreAreas.TheatreArea;
-          theatres.shift()
+          theatres.shift();
           this.theatres = this.filteredTheatres = theatres;
           this.$.ironList.notifyResize();
           this.theatresFetched = true;
@@ -164,6 +186,17 @@
       showLoading: function(theatresFetched) {
         return theatresFetched ? 'hide' : '';
       },
+
+      filterTapObserver: function() {
+        this.showFilters = !this.showFilters;
+        if (this.showFilters) {
+          //TODO SCROLL TO TOP
+        }
+      },
+
+      showFilterClass: function(showFilters) {
+        return showFilters ? 'filters closed' : 'filters';
+      }
 
     });
   </script>

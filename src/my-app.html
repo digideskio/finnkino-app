@@ -73,7 +73,6 @@
       .close-toast-button {
         text-transform: none;
         color: var(--app-primary-color);
-        ;
       }
     </style>
 
@@ -87,7 +86,7 @@
         <!-- Todo show after know what to do with drawer -->
         <app-toolbar>Menu</app-toolbar>
         <iron-selector selected="[[page]]" attr-for-selected="name" class="drawer-list" role="navigation">
-          <a name="movie-theaters" href="/movie-theaters">Theaters</a>
+          <a name="movie-theatres" href="/movie-theatres">Theaters</a>
         </iron-selector>
       </app-drawer>
 
@@ -102,15 +101,15 @@
               <paper-icon-button icon="arrow-back"></paper-icon-button>
             </a>
             <div title class="title">Finnkino Movies</div>
-            <paper-icon-button icon="icons:filter-list"></paper-icon-button>
+            <paper-icon-button icon="icons:filter-list" on-tap="_tapFilter"></paper-icon-button>
             <paper-icon-button src="/images/Octocat.png" on-tap="_openGithub"></paper-icon-button>
 
           </app-toolbar>
         </app-header>
 
         <iron-pages role="main" selected="[[page]]" attr-for-selected="name">
-          <movie-theaters name="movie-theaters"></movie-theaters>
-          <theatre-schedule name="theatre-schedule" route-data="[[subroute]]"></theatre-schedule>
+          <movie-theatres name="movie-theatres" filter-tapped="[[showFilters]]"></movie-theatres>
+          <theatre-schedule name="theatre-schedule" route-data="[[subroute]]" filter-tapped="[[showFilters]]"></theatre-schedule>
         </iron-pages>
 
       </app-header-layout>
@@ -151,7 +150,13 @@
 
         githubUrl: {
           type: String,
-          value: 'https://github.com/samiheikki/finnkino-app'
+          value: 'https://github.com/samiheikki/finnkino-app',
+          readOnly: true
+        },
+
+        showFilters: {
+          type: Boolean,
+          value: false
         }
 
       },
@@ -161,16 +166,18 @@
       ],
 
       _routePageChanged: function(page) {
-        this.page = page || 'movie-theaters';
+        this.page = page || 'movie-theatres';
       },
 
       _pageChanged: function(page) {
         // load page import on demand.
-        console.log(page);
+        if(this.showFilters) {
+          this.showFilters = false;
+        }
         this.importHref(
           this.resolveUrl(page + '.html'), null, null, true);
 
-        this.showBackIcon = (page === 'movie-theaters')
+        this.showBackIcon = (page === 'movie-theatres')
       },
 
       _showBackIcon: function(showBackIcon) {
@@ -198,6 +205,10 @@
       _cancelGithub: function() {
         this.$.githubToast.close();
         this.moveToGithub = false;
+      },
+
+      _tapFilter: function() {
+        this.showFilters = !this.showFilters;
       }
 
     });

@@ -2,7 +2,7 @@
   "entrypoint": "index.html",
   "shell": "src/my-app.html",
   "fragments": [
-    "src/movie-theaters.html",
+    "src/movie-theatres.html",
     "src/theatre-schedule.html"
   ]
 }
