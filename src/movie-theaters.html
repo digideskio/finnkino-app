@@ -105,7 +105,9 @@
 
       attached: function() {
         this.$.ajax.addEventListener('response', function() {
-          this.theatres = this.filteredTheatres = this.xml2json(this.xmlData).TheatreAreas.TheatreArea;
+          var theatres = this.xml2json(this.xmlData).TheatreAreas.TheatreArea;
+          theatres.shift()
+          this.theatres = this.filteredTheatres = theatres;
           this.$.ironList.notifyResize();
           this.theatresFetched = true;
         }.bind(this));
