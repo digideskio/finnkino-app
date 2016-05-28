@@ -3,6 +3,7 @@
 <link rel="import" href="../bower_components/iron-list/iron-list.html">
 <link rel="import" href="../bower_components/paper-input/paper-input.html">
 <link rel="import" href="../bower_components/paper-progress/paper-progress.html">
+<link rel="import" href="../bower_components/paper-toast/paper-toast.html">
 
 <dom-module id="movie-theatres">
 
@@ -64,25 +65,10 @@
       .hide {
         display: none;
       }
-
-      .filters {
-        max-height: 100px;
-        transition-property: all;
-        transition-duration: .5s;
-        transition-timing-function: cubic-bezier(0, 1, 0.5, 1);
-        overflow-y: hidden;
-      }
-
-      .filters.closed {
-        max-height: 0;
-      }
     </style>
 
     <iron-ajax url="https://www.finnkino.fi/xml/TheatreAreas/" last-response="{{xmlData}}" auto handle-as="xml" id="ajax"></iron-ajax>
     <paper-progress indeterminate class$="[[showLoading(theatresFetched)]]"></paper-progress>
-    <div id="filters" class$="[[showFilterClass(showFilters)]]">
-      <paper-input label="Filter theatres" value="{{filterValue}}" on-keyup="filterList"></paper-input>
-    </div>
     <iron-list items="[[filteredTheatres]]" as="item" id="ironList">
       <template>
         <div>
@@ -96,6 +82,9 @@
         </div>
       </template>
     </iron-list>
+    <paper-toast id="filterToast" duration="0" text="Filter">
+      <paper-input label="Filter theatres" value="{{filterValue}}" on-keyup="filterList"></paper-input>
+    </paper-toast>
 
   </template>
 
@@ -190,12 +179,10 @@
       filterTapObserver: function() {
         this.showFilters = !this.showFilters;
         if (this.showFilters) {
-          //TODO SCROLL TO TOP
+          this.$.filterToast.hide();
+        } else {
+          this.$.filterToast.show();
         }
-      },
-
-      showFilterClass: function(showFilters) {
-        return showFilters ? 'filters closed' : 'filters';
       }
 
     });

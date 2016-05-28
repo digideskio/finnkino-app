@@ -7,6 +7,7 @@
 <link rel="import" href="../bower_components/paper-progress/paper-progress.html">
 <link rel="import" href="../bower_components/iron-icons/iron-icons.html">
 <link rel="import" href="../bower_components/paper-input/paper-input.html">
+<link rel="import" href="../bower_components/paper-toast/paper-toast.html">
 
 <dom-module id="theatre-schedule">
 
@@ -110,9 +111,6 @@
 
     <iron-ajax url="https://www.finnkino.fi/xml/Schedule/" last-response="{{xmlData}}" auto handle-as="xml" id="ajax" params="{{getParameters}}"></iron-ajax>
     <paper-progress indeterminate class$="[[showLoading(scheduleFetched)]]"></paper-progress>
-    <div id="filters" class$="[[showFilterClass(showFilters)]]">
-      <paper-input label="Filter shows" value="{{filterValue}}" on-keyup="filterList"></paper-input>
-    </div>
     <iron-list items="[[filteredShows]]" as="item" id="ironList" selection-enabled multi-selection>
       <template>
         <div>
@@ -132,6 +130,10 @@
         </div>
       </template>
     </iron-list>
+
+    <paper-toast id="filterToast" duration="0" text="Filter">
+      <paper-input label="Filter shows" value="{{filterValue}}" on-keyup="filterList"></paper-input>
+    </paper-toast>
 
   </template>
 
@@ -261,12 +263,10 @@
       filterTapObserver: function() {
         this.showFilters = !this.showFilters;
         if (this.showFilters) {
-          //TODO SCROLL TO TOP
+          this.$.filterToast.hide();
+        } else {
+          this.$.filterToast.show();
         }
-      },
-
-      showFilterClass: function(showFilters) {
-        return showFilters ? 'filters closed' : 'filters';
       },
 
       xml2json: function(xml) {
