@@ -20,7 +20,6 @@
   <template>
 
     <style>
-
       :host {
         display: block;
         --app-primary-color: #F44336;
@@ -31,6 +30,7 @@
         background-color: var(--app-primary-color);
         color: black;
       }
+
       app-header paper-icon-button {
         --paper-icon-button-ink-color: white;
         color: white;
@@ -39,6 +39,7 @@
       .drawer-list {
         margin: 0 20px;
       }
+
       .drawer-list a {
         display: block;
         padding: 0 16px;
@@ -46,42 +47,44 @@
         text-decoration: none;
         color: var(--app-secondary-color);
       }
+
       .drawer-list a.iron-selected {
         color: black;
         font-weight: bold;
       }
+
       .drawer-list a.subroute {
         padding-left: 32px;
       }
+
       .inherit {
         color: inherit;
         background-color: inherit;
       }
+
       .hide {
         display: none;
       }
+
       .title {
         color: white;
       }
+
       .close-toast-button {
-    text-transform: none;
-    color: var(--app-primary-color);;
-  }
-
-
+        text-transform: none;
+        color: var(--app-primary-color);
+        ;
+      }
     </style>
 
     <app-location route="{{route}}"></app-location>
-    <app-route
-        route="{{route}}"
-        pattern="/:page"
-        data="{{routeData}}"
-        tail="{{subroute}}"></app-route>
+    <app-route route="{{route}}" pattern="/:page" data="{{routeData}}" tail="{{subroute}}"></app-route>
 
     <app-drawer-layout fullbleed>
 
       <!-- Drawer content -->
-      <app-drawer style="display: none;"> <!-- Todo show after know what to do with drawer -->
+      <app-drawer style="display: none;">
+        <!-- Todo show after know what to do with drawer -->
         <app-toolbar>Menu</app-toolbar>
         <iron-selector selected="[[page]]" attr-for-selected="name" class="drawer-list" role="navigation">
           <a name="movie-theaters" href="/movie-theaters">Theaters</a>
@@ -93,8 +96,11 @@
 
         <app-header condenses reveals effects="waterfall">
           <app-toolbar>
-            <paper-icon-button icon="menu" drawer-toggle style="display:none;"></paper-icon-button> <!-- Todo show after know what to do with drawer -->
-            <a href="/" class$="[[_showBackIcon(showBackIcon)]]"><paper-icon-button icon="arrow-back"></paper-icon-button></a>
+            <paper-icon-button icon="menu" drawer-toggle style="display:none;"></paper-icon-button>
+            <!-- Todo show after know what to do with drawer -->
+            <a href="/" class$="[[_showBackIcon(showBackIcon)]]">
+              <paper-icon-button icon="arrow-back"></paper-icon-button>
+            </a>
             <div title class="title">Finnkino Movies</div>
             <paper-icon-button icon="icons:filter-list"></paper-icon-button>
             <paper-icon-button src="/images/Octocat.png" on-tap="_openGithub"></paper-icon-button>
@@ -117,7 +123,6 @@
   </template>
 
   <script>
-
     Polymer({
 
       is: 'my-app',
@@ -176,7 +181,7 @@
         this.githubMsg = 'Moving to Github in 3';
         this.$.githubToast.open();
         var second = 2;
-        var moveInterval = setInterval(function(){
+        var moveInterval = setInterval(function() {
           if (second === 0) {
             clearInterval(moveInterval);
             if (this.moveToGithub) {
@@ -190,13 +195,12 @@
         }.bind(this), 1000);
       },
 
-      _cancelGithub: function () {
+      _cancelGithub: function() {
         this.$.githubToast.close();
         this.moveToGithub = false;
       }
 
     });
-
   </script>
 
 </dom-module>
