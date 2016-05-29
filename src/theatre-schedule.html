@@ -8,6 +8,7 @@
 <link rel="import" href="../bower_components/paper-input/paper-input.html">
 <link rel="import" href="../bower_components/paper-toast/paper-toast.html">
 <link rel="import" href="../bower_components/paper-fab/paper-fab.html">
+<link rel="import" href="../bower_components/vaadin-date-picker/vaadin-date-picker.html">
 
 <dom-module id="theatre-schedule">
 
@@ -154,9 +155,11 @@
     <app-drawer id="filtersDrawer">
       <div class="filters-list">
         <paper-input label="Search" value="{{filterValue}}" on-keyup="filterList" id="searchFilter"></paper-input>
+        <vaadin-date-picker value="{{filters.date}}" label="Date" id="datePicker"></vaadin-date-picker>
         <paper-button on-tap="toggleFilters" class="close-toast-button">Hide</paper-button>
       </div>
     </app-drawer>
+    <paper-toast text="Movies not found" id="notFoundToast"></paper-toast>
 
   </template>
 
@@ -192,7 +195,27 @@
         showFilters: {
           type: Boolean,
           value: true
+        },
+        filters: {
+          type: Object,
+          value: function() {
+            var today = new Date();
+            return {
+              'date': today.toISOString().split('T')[0]
+            }
+          }
         }
+      },
+
+      attached: function() {
+        this.addDateEventListener();
+      },
+
+      addDateEventListener: function() {
+        this.$.datePicker.addEventListener('value-changed', function(){
+          this.scheduleFetched = false;
+          this.fetchSchedule();
+        }.bind(this));
       },
 
       routeChanged: function() {
@@ -233,14 +256,26 @@
       },
 
       fetchSchedule: function() {
-        this.getParameters = {
-          area: this.theatreId
-        }
+        this.async(function(){
+
+            var dateArray = this.filters.date.split('-');
+            var date = [dateArray[2], dateArray[1], dateArray[0]].join('.')
+          this.getParameters = {
+            area: this.theatreId,
+            dt: date
+          }
+        });
       },
 
       xmlDataChanged: function() {
         var shows = this.xml2json(this.xmlData).Schedule.Shows.Show;
-        this.filteredShows = this.shows = this.filterFutureShows(shows);
+        if(shows) {
+          this.filteredShows = this.shows = this.filterFutureShows(shows);
+        } else {
+          this.filteredShows = this.shows = [];
+          this.$.notFoundToast.open();
+          //show
+        }
         this.async(function(){
           this.$.ironList.notifyResize();
         });
@@ -252,6 +287,7 @@
       filterFutureShows: function(shows) {
         var now = new Date();
         var filteredShows = [];
+        //TODO Check the date
         shows.forEach(function(value){
           var showTime = new Date (value.dttmShowStartUTC);
           if (showTime.getTime()  > now.getTime()) {
