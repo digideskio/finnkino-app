@@ -67,7 +67,6 @@
 
       .more-icon {
         display: inline-block;
-        float: right;
         --paper-fab-background: var(--app-primary-color);
       }
 
@@ -146,8 +145,8 @@
         <div class$="{{getClassForItem(item)}}" tabindex$="[[tabIndex]]">
           <div class="pad">
             <div class="primary">
-              [[getTimeForItem(item.dttmShowStartUTC)]] {{item.OriginalTitle}}
               <paper-fab mini icon="{{getIconForItem(item)}}" index="{{index}}" title="More" class="more-icon" on-tap="moreIconTapped"></paper-fab>
+              [[getTimeForItem(item.dttmShowStartUTC)]] {{item.OriginalTitle}}
             </div>
             <div class="more">
               <a href="{{item.ShowURL}}" class="inherit">
@@ -302,7 +301,6 @@
       filterFutureShows: function(shows) {
         var now = new Date();
         var filteredShows = [];
-        //TODO Check the date
         shows.forEach(function(value) {
           var showTime = new Date(value.dttmShowStartUTC);
           if (showTime.getTime() > now.getTime()) {
@@ -322,7 +320,9 @@
 
       getTimeForItem: function(dttmShowStartUTC) {
         var date = new Date(dttmShowStartUTC);
-        return date.getHours() + ':' + (('' + date.getMinutes()).length === 1 ? date.getMinutes() + '0' : date.getMinutes());
+        var dateString = date.toISOString().split('T')[0];
+        var time = date.getHours() + ':' + (('' + date.getMinutes()).length === 1 ? date.getMinutes() + '0' : date.getMinutes());
+        return [dateString, time].join(' ');
       },
 
       expandMore: function() {
