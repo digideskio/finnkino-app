@@ -123,7 +123,11 @@
         theatresFetched: {
           type: Boolean,
           value: false
-        }
+        },
+        routeData: {
+          type: Object,
+          observer: 'clearFilters'
+        },
       },
 
       attached: function() {
@@ -202,6 +206,12 @@
         this.async(function() {
           this.$.searchFilter.focus();
         }, 100)
+      },
+
+      clearFilters: function() {
+        this.filterValue = '';
+        this.filterList();
+        this.closeFilters();
       }
 
     });
