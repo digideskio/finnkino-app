@@ -1,6 +1,5 @@
 <link rel="import" href="../bower_components/polymer/polymer.html">
 <link rel="import" href="../bower_components/iron-ajax/iron-ajax.html">
-<link rel="import" href="../bower_components/iron-list/iron-list.html">
 <link rel="import" href="../bower_components/paper-button/paper-button.html">
 <link rel="import" href="../bower_components/paper-input/paper-input.html">
 <link rel="import" href="../bower_components/paper-progress/paper-progress.html">
@@ -18,10 +17,6 @@
       :host {
         display: block;
         padding: 10px;
-      }
-
-      iron-list {
-        padding-bottom: 16px;
       }
 
       .item {
@@ -144,25 +139,24 @@
 
     <iron-ajax url="https://www.finnkino.fi/xml/Schedule/" last-response="{{xmlData}}" auto handle-as="xml" id="ajax" params="{{getParameters}}"></iron-ajax>
     <paper-progress indeterminate class$="[[showLoading(scheduleFetched)]]"></paper-progress>
-    <iron-list items="[[filteredShows]]" as="item" id="ironList" selection-enabled multi-selection>
-      <template>
-        <div>
-          <div class$="[[getClassForItem(item, selected)]]" tabindex$="[[tabIndex]]">
-            <div class="pad">
-              <div class="primary">
-                [[getTimeForItem(item.dttmShowStartUTC)]] [[item.OriginalTitle]]
-                <paper-fab mini icon="[[getIconForItem(item, selected)]]" title="heart" class="more-icon"></paper-fab>
-              </div>
-              <div class="more">
-                <a href="[[item.ShowURL]]" class="inherit">
-                  <paper-fab mini icon="add-shopping-cart" title="heart" class="buy-icon"></paper-fab>
-                </a>
-              </div>
+
+    <template is="dom-repeat" items="{{filteredShows}}" id="showsTemplate">
+      <div>
+        <div class$="{{getClassForItem(item)}}" tabindex$="[[tabIndex]]">
+          <div class="pad">
+            <div class="primary">
+              [[getTimeForItem(item.dttmShowStartUTC)]] {{item.OriginalTitle}}
+              <paper-fab mini icon="{{getIconForItem(item)}}" index="{{index}}" title="More" class="more-icon" on-tap="moreIconTapped"></paper-fab>
+            </div>
+            <div class="more">
+              <a href="{{item.ShowURL}}" class="inherit">
+                <paper-fab mini icon="add-shopping-cart" title="heart" class="buy-icon"></paper-fab>
+              </a>
             </div>
           </div>
         </div>
-      </template>
-    </iron-list>
+      </div>
+    </template>
 
     <paper-fab icon="icons:filter-list" title="Filters" on-tap="toggleFilters" class="filter-fab"></paper-fab>
 
@@ -274,7 +268,6 @@
 
       clearSchedule: function() {
         this.filteredShows = this.shows = [];
-        this.$.ironList.notifyResize();
       },
 
       fetchSchedule: function() {
@@ -299,9 +292,6 @@
           this.filteredShows = this.shows = [];
           this.$.notFoundToast.open();
         }
-        this.async(function() {
-          this.$.ironList.notifyResize();
-        });
         setTimeout(function() {
           this.scheduleFetched = true;
         }.bind(this), 1);
@@ -320,12 +310,12 @@
         return filteredShows;
       },
 
-      getClassForItem: function(item, selected) {
-        return selected ? 'item expanded' : 'item';
+      getClassForItem: function(item) {
+        return item.selected ? 'item expanded' : 'item';
       },
 
-      getIconForItem: function(item, selected) {
-        return selected ? 'expand-less' : 'expand-more';
+      getIconForItem: function(item) {
+        return item.selected ? 'expand-less' : 'expand-more';
       },
 
       getTimeForItem: function(dttmShowStartUTC) {
@@ -386,6 +376,13 @@
         this.filterValue = '';
         this.filterList();
         this.closeFilters();
+      },
+
+      moreIconTapped: function(e) {
+        var index = e.target.index;
+        this.filteredShows[index].selected = !this.filteredShows[index].selected;
+        var item = e.target.parentNode.parentNode.parentNode;
+        this.filteredShows[index].selected ? item.classList.add("expanded"): item.classList.remove("expanded");
       }
 
     });

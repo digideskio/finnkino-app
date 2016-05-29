@@ -1,6 +1,5 @@
 <link rel="import" href="../bower_components/polymer/polymer.html">
 <link rel="import" href="../bower_components/iron-ajax/iron-ajax.html">
-<link rel="import" href="../bower_components/iron-list/iron-list.html">
 <link rel="import" href="../bower_components/paper-input/paper-input.html">
 <link rel="import" href="../bower_components/paper-progress/paper-progress.html">
 <link rel="import" href="../bower_components/paper-fab/paper-fab.html">
@@ -15,10 +14,6 @@
       :host {
         display: block;
         padding: 10px;
-      }
-
-      iron-list {
-        padding-bottom: 16px;
       }
 
       .item {
@@ -95,19 +90,17 @@
 
     <iron-ajax url="https://www.finnkino.fi/xml/TheatreAreas/" last-response="{{xmlData}}" auto handle-as="xml" id="ajax"></iron-ajax>
     <paper-progress indeterminate class$="[[showLoading(theatresFetched)]]"></paper-progress>
-    <iron-list items="[[filteredTheatres]]" as="item" id="ironList">
-      <template>
-        <div>
-          <a href="/theatre-schedule/[[item.ID]]">
-            <div class="item" tabindex$="[[tabIndex]]">
-              <div class="pad">
-                <div class="primary">[[item.Name]]</div>
-              </div>
+    <template is="dom-repeat" items="[[filteredTheatres]]">
+      <div>
+        <a href="/theatre-schedule/[[item.ID]]">
+          <div class="item" tabindex$="[[tabIndex]]">
+            <div class="pad">
+              <div class="primary">[[item.Name]]</div>
             </div>
-          </a>
-        </div>
-      </template>
-    </iron-list>
+          </div>
+        </a>
+      </div>
+    </template>
     <paper-fab icon="icons:filter-list" title="Filters" on-tap="toggleFilters"></paper-fab>
     <app-drawer id="filtersDrawer">
       <app-toolbar>
@@ -148,9 +141,6 @@
           theatres.shift();
           this.theatres = this.filteredTheatres = theatres;
           this.theatresFetched = true;
-          this.async(function(){
-            this.$.ironList.notifyResize();
-          });
         }.bind(this));
       },
 
@@ -165,9 +155,6 @@
             }
           }.bind(this));
           this.setFilteredTheathers(filteredList);
-          this.async(function(){
-            this.$.ironList.notifyResize();
-          });
         }
 
       },
