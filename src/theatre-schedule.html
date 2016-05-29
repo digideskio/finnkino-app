@@ -119,9 +119,10 @@
         color: var(--app-primary-color);
       }
 
-      #searchFilter {
-        --paper-input-container-color: var(--app-primary-color);
-        --paper-input-container-input-color: white;
+      .filters-list {
+        padding-top: 64px;
+        padding-left: 8px;
+        padding-right: 8px;
       }
     </style>
 
@@ -148,11 +149,14 @@
       </template>
     </iron-list>
 
-    <paper-toast id="filterToast2" duration="999999999" text="Filters">
-      <paper-input label="Search" value="{{filterValue}}" on-keyup="filterList" id="searchFilter"></paper-input>
-      <paper-button on-tap="toggleFilters" class="close-toast-button">Hide</paper-button>
-    </paper-toast>
     <paper-fab icon="icons:filter-list" title="Filters" on-tap="toggleFilters" class="filter-fab"></paper-fab>
+
+    <app-drawer id="filtersDrawer">
+      <div class="filters-list">
+        <paper-input label="Search" value="{{filterValue}}" on-keyup="filterList" id="searchFilter"></paper-input>
+        <paper-button on-tap="toggleFilters" class="close-toast-button">Hide</paper-button>
+      </div>
+    </app-drawer>
 
   </template>
 
@@ -184,10 +188,6 @@
         scheduleFetched: {
           type: Boolean,
           value: false
-        },
-        filterTapped: {
-          type: Boolean,
-          observer: 'filterTapObserver'
         },
         showFilters: {
           type: Boolean,
@@ -282,15 +282,6 @@
 
       },
 
-      filterTapObserver: function() {
-        this.showFilters = !this.showFilters;
-        if (this.showFilters) {
-          this.$.filterToast2.hide();
-        } else {
-          this.$.filterToast2.show();
-        }
-      },
-
       xml2json: function(xml) {
         try {
           var obj = {};
@@ -321,18 +312,15 @@
       },
 
       toggleFilters: function() {
-        this.$.filterToast2.opened ? this.closeFilters() : this.openFilters();
+        this.$.filtersDrawer.opened ? this.closeFilters() : this.openFilters();
       },
 
       closeFilters: function() {
-        this.$.filterToast2.hide();
+        this.$.filtersDrawer.close();
       },
 
       openFilters: function() {
-        this.$.filterToast2.show();
-        this.async(function() {
-          this.$.searchFilter.focus();
-        }, 100)
+        this.$.filtersDrawer.open();
       },
 
       clearFilters: function() {
