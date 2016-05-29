@@ -241,7 +241,9 @@
       xmlDataChanged: function() {
         var shows = this.xml2json(this.xmlData).Schedule.Shows.Show;
         this.filteredShows = this.shows = this.filterFutureShows(shows);
-        this.$.ironList.notifyResize();
+        this.async(function(){
+          this.$.ironList.notifyResize();
+        });
         setTimeout(function() {
           this.scheduleFetched = true;
         }.bind(this), 1);
