@@ -131,6 +131,7 @@
       .title {
         color: white;
       }
+
       .back-button {
         color: white;
       }
@@ -379,10 +380,17 @@
       },
 
       moreIconTapped: function(e) {
-        var index = e.target.index;
+        var fab = e.target;
+        var index = fab.index;
         this.filteredShows[index].selected = !this.filteredShows[index].selected;
         var item = e.target.parentNode.parentNode.parentNode;
-        this.filteredShows[index].selected ? item.classList.add("expanded"): item.classList.remove("expanded");
+        if (this.filteredShows[index].selected) {
+          item.classList.add("expanded");
+          fab.icon = 'expand-less'
+        } else {
+          item.classList.remove("expanded");
+          fab.icon = 'expand-more'
+        }
       }
 
     });
