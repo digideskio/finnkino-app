@@ -5,10 +5,10 @@
 <link rel="import" href="../bower_components/paper-input/paper-input.html">
 <link rel="import" href="../bower_components/paper-progress/paper-progress.html">
 <link rel="import" href="../bower_components/iron-icons/iron-icons.html">
-<link rel="import" href="../bower_components/paper-input/paper-input.html">
 <link rel="import" href="../bower_components/paper-toast/paper-toast.html">
 <link rel="import" href="../bower_components/paper-fab/paper-fab.html">
 <link rel="import" href="../bower_components/vaadin-date-picker/vaadin-date-picker.html">
+<link rel="import" href="../bower_components/app-layout/app-toolbar/app-toolbar.html">
 
 <dom-module id="theatre-schedule">
 
@@ -121,9 +121,23 @@
       }
 
       .filters-list {
-        padding-top: 64px;
         padding-left: 8px;
         padding-right: 8px;
+      }
+
+      vaadin-date-picker {
+        --primary-color: var(--app-primary-color);
+      }
+
+      app-toolbar {
+        background-color: var(--app-primary-color);
+      }
+
+      .title {
+        color: white;
+      }
+      .back-button {
+        color: white;
       }
     </style>
 
@@ -152,14 +166,22 @@
 
     <paper-fab icon="icons:filter-list" title="Filters" on-tap="toggleFilters" class="filter-fab"></paper-fab>
 
-    <app-drawer id="filtersDrawer">
+    <app-drawer id="filtersDrawer" align="start">
+      <app-toolbar>
+        <a href="/" class="back-button">
+          <paper-icon-button icon="arrow-back"></paper-icon-button>
+        </a>
+        <div title class="title">Finnkino Movies</div>
+      </app-toolbar>
       <div class="filters-list">
         <paper-input label="Search" value="{{filterValue}}" on-keyup="filterList" id="searchFilter"></paper-input>
         <vaadin-date-picker value="{{filters.date}}" label="Date" id="datePicker"></vaadin-date-picker>
         <paper-button on-tap="toggleFilters" class="close-toast-button">Hide</paper-button>
       </div>
     </app-drawer>
-    <paper-toast text="Movies not found" id="notFoundToast"></paper-toast>
+    <paper-toast text="Loading..." id="loadingToast"></paper-toast>
+    <paper-toast text="Movies updated" id="updatedToast"></paper-toast>
+    <paper-toast text="No movies found" id="notFoundToast"></paper-toast>
 
   </template>
 
@@ -212,7 +234,7 @@
       },
 
       addDateEventListener: function() {
-        this.$.datePicker.addEventListener('value-changed', function(){
+        this.$.datePicker.addEventListener('value-changed', function() {
           this.scheduleFetched = false;
           this.fetchSchedule();
         }.bind(this));
@@ -256,10 +278,11 @@
       },
 
       fetchSchedule: function() {
-        this.async(function(){
+        this.$.loadingToast.show();
+        this.async(function() {
 
-            var dateArray = this.filters.date.split('-');
-            var date = [dateArray[2], dateArray[1], dateArray[0]].join('.')
+          var dateArray = this.filters.date.split('-');
+          var date = [dateArray[2], dateArray[1], dateArray[0]].join('.')
           this.getParameters = {
             area: this.theatreId,
             dt: date
@@ -269,14 +292,14 @@
 
       xmlDataChanged: function() {
         var shows = this.xml2json(this.xmlData).Schedule.Shows.Show;
-        if(shows) {
+        if (shows) {
+          this.$.updatedToast.open();
           this.filteredShows = this.shows = this.filterFutureShows(shows);
         } else {
           this.filteredShows = this.shows = [];
           this.$.notFoundToast.open();
-          //show
         }
-        this.async(function(){
+        this.async(function() {
           this.$.ironList.notifyResize();
         });
         setTimeout(function() {
@@ -288,9 +311,9 @@
         var now = new Date();
         var filteredShows = [];
         //TODO Check the date
-        shows.forEach(function(value){
-          var showTime = new Date (value.dttmShowStartUTC);
-          if (showTime.getTime()  > now.getTime()) {
+        shows.forEach(function(value) {
+          var showTime = new Date(value.dttmShowStartUTC);
+          if (showTime.getTime() > now.getTime()) {
             filteredShows.push(value);
           }
         });
