@@ -4,6 +4,7 @@
 <link rel="import" href="../bower_components/paper-input/paper-input.html">
 <link rel="import" href="../bower_components/paper-progress/paper-progress.html">
 <link rel="import" href="../bower_components/paper-toast/paper-toast.html">
+<link rel="import" href="../bower_components/paper-fab/paper-fab.html">
 
 <dom-module id="movie-theatres">
 
@@ -62,8 +63,25 @@
         width: 100%;
       }
 
+      paper-fab {
+        --paper-fab-background: var(--app-primary-color);
+        position: fixed;
+        bottom: 16px;
+        right: 16px;
+      }
+
       .hide {
         display: none;
+      }
+
+      .close-toast-button {
+        text-transform: none;
+        color: var(--app-primary-color);
+      }
+
+      #searchFilter {
+        --paper-input-container-color: var(--app-primary-color);
+        --paper-input-container-input-color: white;
       }
     </style>
 
@@ -82,9 +100,11 @@
         </div>
       </template>
     </iron-list>
-    <paper-toast id="filterToast" duration="0" text="Filter">
-      <paper-input label="Filter theatres" value="{{filterValue}}" on-keyup="filterList"></paper-input>
+    <paper-toast id="filterToast" duration="9999999" text="Filters">
+      <paper-input label="Search" value="{{filterValue}}" on-keyup="filterList" id="searchFilter"></paper-input>
+      <paper-button on-tap="toggleFilters" class="close-toast-button">Hide</paper-button>
     </paper-toast>
+    <paper-fab icon="icons:filter-list" title="Filters" on-tap="toggleFilters"></paper-fab>
 
   </template>
 
@@ -103,14 +123,6 @@
         theatresFetched: {
           type: Boolean,
           value: false
-        },
-        filterTapped: {
-          type: Boolean,
-          observer: 'filterTapObserver'
-        },
-        showFilters: {
-          type: Boolean,
-          value: true
         }
       },
 
@@ -122,6 +134,7 @@
           this.$.ironList.notifyResize();
           this.theatresFetched = true;
         }.bind(this));
+        console.log("attach");
       },
 
       filterList: function() {
@@ -176,13 +189,19 @@
         return theatresFetched ? 'hide' : '';
       },
 
-      filterTapObserver: function() {
-        this.showFilters = !this.showFilters;
-        if (this.showFilters) {
-          this.$.filterToast.hide();
-        } else {
-          this.$.filterToast.show();
-        }
+      toggleFilters: function() {
+        this.$.filterToast.opened ? this.closeFilters() : this.openFilters();
+      },
+
+      closeFilters: function() {
+        this.$.filterToast.hide();
+      },
+
+      openFilters: function() {
+        this.$.filterToast.show();
+        this.async(function() {
+          this.$.searchFilter.focus();
+        }, 100)
       }
 
     });

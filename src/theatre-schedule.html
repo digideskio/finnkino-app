@@ -3,11 +3,11 @@
 <link rel="import" href="../bower_components/iron-list/iron-list.html">
 <link rel="import" href="../bower_components/paper-button/paper-button.html">
 <link rel="import" href="../bower_components/paper-input/paper-input.html">
-<link rel="import" href="../bower_components/paper-fab/paper-fab.html">
 <link rel="import" href="../bower_components/paper-progress/paper-progress.html">
 <link rel="import" href="../bower_components/iron-icons/iron-icons.html">
 <link rel="import" href="../bower_components/paper-input/paper-input.html">
 <link rel="import" href="../bower_components/paper-toast/paper-toast.html">
+<link rel="import" href="../bower_components/paper-fab/paper-fab.html">
 
 <dom-module id="theatre-schedule">
 
@@ -106,6 +106,23 @@
       .filters.closed {
         max-height: 0;
       }
+
+      .filter-fab {
+        --paper-fab-background: var(--app-primary-color);
+        position: fixed;
+        bottom: 16px;
+        right: 16px;
+      }
+
+      .close-toast-button {
+        text-transform: none;
+        color: var(--app-primary-color);
+      }
+
+      #searchFilter {
+        --paper-input-container-color: var(--app-primary-color);
+        --paper-input-container-input-color: white;
+      }
     </style>
 
 
@@ -131,9 +148,11 @@
       </template>
     </iron-list>
 
-    <paper-toast id="filterToast" duration="0" text="Filter">
-      <paper-input label="Filter shows" value="{{filterValue}}" on-keyup="filterList"></paper-input>
+    <paper-toast id="filterToast2" duration="999999999" text="Filters">
+      <paper-input label="Search" value="{{filterValue}}" on-keyup="filterList" id="searchFilter"></paper-input>
+      <paper-button on-tap="toggleFilters" class="close-toast-button">Hide</paper-button>
     </paper-toast>
+    <paper-fab icon="icons:filter-list" title="Filters" on-tap="toggleFilters" class="filter-fab"></paper-fab>
 
   </template>
 
@@ -263,9 +282,9 @@
       filterTapObserver: function() {
         this.showFilters = !this.showFilters;
         if (this.showFilters) {
-          this.$.filterToast.hide();
+          this.$.filterToast2.hide();
         } else {
-          this.$.filterToast.show();
+          this.$.filterToast2.show();
         }
       },
 
@@ -296,6 +315,21 @@
         } catch (e) {
           console.log(e.message);
         }
+      },
+
+      toggleFilters: function() {
+        this.$.filterToast2.opened ? this.closeFilters() : this.openFilters();
+      },
+
+      closeFilters: function() {
+        this.$.filterToast2.hide();
+      },
+
+      openFilters: function() {
+        this.$.filterToast2.show();
+        this.async(function() {
+          this.$.searchFilter.focus();
+        }, 100)
       }
 
     });
