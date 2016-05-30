@@ -86,6 +86,16 @@
       .title {
         color: white;
       }
+
+      .close-toast-button {
+        text-transform: none;
+        color: var(--app-primary-color);
+      }
+
+      app-drawer {
+        border-right: 1px solid;
+        border-color: #eeeeee;
+      }
     </style>
 
     <iron-ajax url="https://www.finnkino.fi/xml/TheatreAreas/" last-response="{{xmlData}}" auto handle-as="xml" id="ajax"></iron-ajax>
@@ -102,13 +112,13 @@
       </div>
     </template>
     <paper-fab icon="icons:filter-list" title="Filters" on-tap="toggleFilters"></paper-fab>
-    <app-drawer id="filtersDrawer">
+    <app-drawer id="filtersDrawer" persistent="true">
       <app-toolbar>
         <div title class="title">Finnkino Movies</div>
       </app-toolbar>
       <div class="filters-list">
         <paper-input label="Search" value="{{filterValue}}" on-keyup="filterList" id="searchFilter"></paper-input>
-        <paper-button on-tap="toggleFilters" class="close-toast-button">Hide</paper-button>
+        <paper-button on-tap="toggleFilters" class="close-toast-button">Close filters</paper-button>
       </div>
     </app-drawer>
   </template>
@@ -133,6 +143,10 @@
           type: Object,
           observer: 'clearFilters'
         },
+        filterTap: {
+          type: Boolean,
+          observer: 'toggleFilters'
+        }
       },
 
       attached: function() {

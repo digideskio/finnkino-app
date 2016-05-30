@@ -140,6 +140,11 @@
       .back-button {
         color: white;
       }
+
+      app-drawer {
+        border-right: 1px solid;
+        border-color: #eeeeee;
+      }
     </style>
 
 
@@ -166,7 +171,7 @@
 
     <paper-fab icon="icons:filter-list" title="Filters" on-tap="toggleFilters" class="filter-fab"></paper-fab>
 
-    <app-drawer id="filtersDrawer" align="start">
+    <app-drawer id="filtersDrawer" persistent="true">
       <app-toolbar>
         <a href="/" class="back-button">
           <paper-icon-button icon="arrow-back"></paper-icon-button>
@@ -177,7 +182,7 @@
         <paper-input label="Search" value="{{filterValue}}" on-keyup="filterList" id="searchFilter"></paper-input>
         <vaadin-date-picker value="{{filters.date}}" label="Date" id="datePicker"></vaadin-date-picker>
         <vaadin-combo-box items="[[genres]]" item-label-path="eng" item-value-path="fin" label="Genre" id="comboBox" value="{{genre}}"></vaadin-combo-box>
-        <paper-button on-tap="toggleFilters" class="close-toast-button">Hide</paper-button>
+        <paper-button on-tap="toggleFilters" class="close-toast-button">Close filters</paper-button>
       </div>
     </app-drawer>
     <paper-toast text="Loading..." id="loadingToast"></paper-toast>
@@ -227,6 +232,10 @@
               'date': today.toISOString().split('T')[0]
             }
           }
+        },
+        filterTap: {
+          type: Boolean,
+          observer: 'toggleFilters'
         },
         genres: {
           type: Array,

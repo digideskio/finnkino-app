@@ -102,14 +102,15 @@
               <paper-icon-button icon="arrow-back"></paper-icon-button>
             </a>
             <div title class="title">Finnkino Movies</div>
+            <paper-icon-button icon="icons:filter-list" on-tap="_filterTap"></paper-icon-button>
             <paper-icon-button src="/images/Octocat.png" on-tap="_openGithub"></paper-icon-button>
 
           </app-toolbar>
         </app-header>
 
         <iron-pages role="main" selected="[[page]]" attr-for-selected="name">
-          <movie-theatres name="movie-theatres" route-data="[[subroute]]"></movie-theatres>
-          <theatre-schedule name="theatre-schedule" route-data="[[subroute]]"></theatre-schedule>
+          <movie-theatres name="movie-theatres" route-data="[[subroute]]" filter-tap="[[filterTapped]]"></movie-theatres>
+          <theatre-schedule name="theatre-schedule" route-data="[[subroute]]" filter-tap="[[filterTapped]]"></theatre-schedule>
         </iron-pages>
 
       </app-header-layout>
@@ -157,6 +158,10 @@
         showFilters: {
           type: Boolean,
           value: false
+        },
+
+        filterTapped: {
+          type: Boolean
         }
 
       },
@@ -205,6 +210,10 @@
       _cancelGithub: function() {
         this.$.githubToast.close();
         this.moveToGithub = false;
+      },
+
+      _filterTap: function() {
+        this.filterTapped = !this.filterTapped;
       }
 
     });
