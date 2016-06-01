@@ -14,6 +14,8 @@
 <link rel="import" href="../bower_components/iron-icon/iron-icon.html">
 <link rel="import" href="../bower_components/iron-pages/iron-pages.html">
 <link rel="import" href="../bower_components/iron-selector/iron-selector.html">
+<link rel="import" href="../bower_components/paper-toast/paper-toast.html">
+<link rel="import" href="movie-filters.html">
 
 <dom-module id="my-app">
 
@@ -75,6 +77,13 @@
         text-transform: none;
         color: var(--app-primary-color);
       }
+
+      .filter-fab {
+        --paper-fab-background: var(--app-primary-color);
+        position: fixed;
+        bottom: 16px;
+        right: 16px;
+      }
     </style>
 
     <app-location route="{{route}}"></app-location>
@@ -83,12 +92,10 @@
     <app-drawer-layout fullbleed>
 
       <!-- Drawer content -->
-      <app-drawer style="display: none;">
+      <app-drawer persistent="true" id="filtersDrawer">
         <!-- Todo show after know what to do with drawer -->
-        <app-toolbar>Menu</app-toolbar>
-        <iron-selector selected="[[page]]" attr-for-selected="name" class="drawer-list" role="navigation">
-          <a name="movie-theatres" href="/movie-theatres">Theaters</a>
-        </iron-selector>
+        <app-toolbar>Filters</app-toolbar>
+        <movie-filters route-data="[[subroute]]"></movie-filters>
       </app-drawer>
 
       <!-- Main content -->
@@ -96,21 +103,19 @@
 
         <app-header condenses reveals effects="waterfall">
           <app-toolbar>
-            <paper-icon-button icon="menu" drawer-toggle style="display:none;"></paper-icon-button>
-            <!-- Todo show after know what to do with drawer -->
             <a href="/" class$="[[_showBackIcon(showBackIcon)]]">
               <paper-icon-button icon="arrow-back"></paper-icon-button>
             </a>
             <div title class="title">Finnkino Movies</div>
-            <paper-icon-button icon="icons:filter-list" on-tap="_filterTap"></paper-icon-button>
+            <paper-icon-button icon="icons:filter-list" drawer-toggle></paper-icon-button>
             <paper-icon-button src="/images/Octocat.png" on-tap="_openGithub"></paper-icon-button>
 
           </app-toolbar>
         </app-header>
 
         <iron-pages role="main" selected="[[page]]" attr-for-selected="name">
-          <movie-theatres name="movie-theatres" route-data="[[subroute]]" filter-tap="[[filterTapped]]"></movie-theatres>
-          <theatre-schedule name="theatre-schedule" route-data="[[subroute]]" filter-tap="[[filterTapped]]"></theatre-schedule>
+          <movie-theatres name="movie-theatres" filters="[[filters]]" id="movieTheatres"></movie-theatres>
+          <theatre-schedule name="theatre-schedule" route-data="[[subroute]]" filters="[[filters]]" id="theatreSchedule"></theatre-schedule>
         </iron-pages>
 
       </app-header-layout>
@@ -119,6 +124,12 @@
     <paper-toast id="githubToast" text="[[githubMsg]]">
       <paper-button on-tap="_cancelGithub" class="close-toast-button">Cancel</paper-button>
     </paper-toast>
+
+    <!--<paper-fab icon="icons:filter-list" title="Filters" on-tap="openDrawer" class="filter-fab"></paper-fab>-->
+
+    <paper-toast text="Loading..." id="loading"></paper-toast>
+    <paper-toast text="Movies updated" id="updated"></paper-toast>
+    <paper-toast text="No movies found" id="not-found"></paper-toast>
 
   </template>
 
@@ -162,7 +173,9 @@
 
         filterTapped: {
           type: Boolean
-        }
+        },
+
+        filters: {}
 
       },
 
@@ -214,6 +227,27 @@
 
       _filterTap: function() {
         this.filterTapped = !this.filterTapped;
+      },
+
+      openDrawer: function() {
+        this.$.filtersDrawer.opened ? this.$.filtersDrawer.close() : this.$.filtersDrawer.open();
+      },
+
+      filtersChanged: function() {
+        if (this.$.movieTheatres && this.$.movieTheatres.filtersChanged) {
+          this.$.movieTheatres.filters = this.filters;
+          this.$.movieTheatres.filtersChanged();
+        }
+        if (this.$.theatreSchedule && this.$.theatreSchedule.filtersChanged) {
+          this.$.theatreSchedule.filters = this.filters;
+          this.$.theatreSchedule.filtersChanged();
+        }
+      },
+
+      showToast: function(toastId) {
+        if(this.$[toastId]) {
+          this.$[toastId].show();
+        }
       }
 
     });

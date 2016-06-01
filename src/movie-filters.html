@@ -1,0 +1,189 @@
+<link rel="import" href="../bower_components/polymer/polymer.html">
+<link rel="import" href="../bower_components/paper-button/paper-button.html">
+<link rel="import" href="../bower_components/paper-input/paper-input.html">
+<link rel="import" href="../bower_components/vaadin-date-picker/vaadin-date-picker.html">
+<link rel="import" href="../bower_components/vaadin-combo-box/vaadin-combo-box.html">
+
+<dom-module id="movie-filters">
+
+  <template>
+
+    <style>
+      :host {
+        display: block;
+        padding: 10px;
+      }
+
+      .filters-list {
+        padding-left: 8px;
+        padding-right: 8px;
+      }
+
+      paper-input,
+      vaadin-combo-box {
+        --paper-input-container-focus-color: var(--app-primary-color);
+        max-width: 840px;
+        margin: 0 auto 0;
+        --primar-color: var(--app-primary-color);
+      }
+
+      vaadin-combo-box-overlay {
+        --primar-color: var(--app-primary-color);
+      }
+
+      .hide {
+        display: none;
+      }
+    </style>
+
+    <div class="filters-list">
+      <paper-input label="Search" value="{{filters.search}}" id="searchFilter" on-keyup="_filtersChanged"></paper-input>
+      <div id="filters" class$="{{getClassForExtraFilters(hideExtraFilters)}}">
+        <vaadin-date-picker value="{{filters.date}}" label="Date" id="datePicker"></vaadin-date-picker>
+        <vaadin-combo-box items="[[genres]]" item-label-path="eng" item-value-path="fin" label="Genre" id="comboBox" value="{{filters.genre}}"></vaadin-combo-box>
+      </div>
+    </div>
+
+  </template>
+
+  <script>
+    Polymer({
+
+      is: 'movie-filters',
+
+      properties: {
+        hideExtraFilters: {
+          type: Boolean,
+          value: false
+        },
+        routeData: {
+          type: Object,
+          observer: 'routeChanged'
+        },
+        searchFilter: {
+          type: String,
+          value: ''
+        },
+        dateFilter: {
+          type: String,
+          value: ''
+        },
+        genreFilter: {
+          type: String,
+          value: ''
+        },
+        filters: {
+          type: Object,
+          value: function() {
+            var today = new Date();
+            return {
+              'date': today.toISOString().split('T')[0],
+              'genre': '',
+              'search': ''
+            }
+          },
+          observer: '_filtersChanged'
+        },
+        genres: {
+          type: Array,
+          readOnly: true,
+          value: function() {
+            return [{
+              eng: '3D',
+              fin: '3D'
+            }, {
+              eng: 'Action',
+              fin: 'Toiminta'
+            }, {
+              eng: 'Adventure',
+              fin: 'Seikkailu'
+            }, {
+              eng: 'Animation',
+              fin: 'Animaatio'
+            }, {
+              eng: 'Biography',
+              fin: 'Elämäkerta'
+            }, {
+              eng: 'Comedy',
+              fin: 'Komedia'
+            }, {
+              eng: 'Drama',
+              fin: 'Draama'
+            }, {
+              eng: 'Documentary',
+              fin: 'Dokumentti'
+            }, {
+              eng: 'Event cinema (not a movie)',
+              fin: 'Event cinema (ei elokuva)'
+            }, {
+              eng: 'Family movies',
+              fin: 'Perhe-elokuva'
+            }, {
+              eng: 'Fantasy',
+              fin: 'Fantasia'
+            }, {
+              eng: 'Finnish',
+              fin: 'Kotimainen'
+            }, {
+              eng: 'Romance',
+              fin: 'Romantiikka'
+            }, {
+              eng: 'Sci-fi',
+              fin: 'Sci-fi'
+            }, {
+              eng: 'Short movie',
+              fin: 'Lyhytelokuva'
+            }, {
+              eng: 'Sports',
+              fin: 'Urheilu'
+            }, {
+              eng: 'Swedish',
+              fin: 'Svenskt tal'
+            }, {
+              eng: 'Thriller',
+              fin: 'Jännitys'
+            }, {
+              eng: 'War',
+              fin: 'Sota'
+            }]
+          }
+        }
+      },
+
+      attached: function() {
+        this.addEventListeners();
+      },
+
+      addEventListeners: function() {
+        this.$.datePicker.addEventListener('value-changed', this._filtersChanged.bind(this));
+        this.$.comboBox.addEventListener('value-changed', this._filtersChanged.bind(this));
+      },
+
+      _filtersChanged: function() {
+        var app = document.querySelector('my-app');
+        app.filters = this.filters;
+        app.filtersChanged();
+      },
+
+      routeChanged: function() {
+        this.clearFilters();
+        this.hideExtraFilters = (this.routeData.prefix === '/');
+      },
+
+      clearFilters: function() {
+        var today = new Date();
+        this.filters = {
+          'date': today.toISOString().split('T')[0],
+          'genre': '',
+          'search': ''
+        };
+      },
+
+      getClassForExtraFilters: function(hideExtraFilters) {
+        return hideExtraFilters ? 'hide' : 'item';
+      },
+
+    });
+  </script>
+
+</dom-module>

@@ -1,10 +1,6 @@
 <link rel="import" href="../bower_components/polymer/polymer.html">
 <link rel="import" href="../bower_components/iron-ajax/iron-ajax.html">
-<link rel="import" href="../bower_components/paper-input/paper-input.html">
 <link rel="import" href="../bower_components/paper-progress/paper-progress.html">
-<link rel="import" href="../bower_components/paper-fab/paper-fab.html">
-<link rel="import" href="../bower_components/app-layout/app-drawer/app-drawer.html">
-<link rel="import" href="../bower_components/app-layout/app-toolbar/app-toolbar.html">
 
 <dom-module id="movie-theatres">
 
@@ -48,22 +44,9 @@
         text-decoration: none;
       }
 
-      paper-input {
-        --paper-input-container-focus-color: var(--app-primary-color);
-        max-width: 840px;
-        margin: 0 auto 0;
-      }
-
       paper-progress {
         --paper-progress-active-color: var(--app-primary-color);
         width: 100%;
-      }
-
-      paper-fab {
-        --paper-fab-background: var(--app-primary-color);
-        position: fixed;
-        bottom: 16px;
-        right: 16px;
       }
 
       .hide {
@@ -73,14 +56,6 @@
       .close-toast-button {
         text-transform: none;
         /*color: var(--app-primary-color);*/
-      }
-
-      .filters-list {
-        padding-left: 8px;
-        padding-right: 8px;
-      }
-      app-toolbar {
-        background-color: var(--app-primary-color);
       }
 
       .title {
@@ -111,16 +86,6 @@
         </a>
       </div>
     </template>
-    <paper-fab icon="icons:filter-list" title="Filters" on-tap="toggleFilters"></paper-fab>
-    <app-drawer id="filtersDrawer" persistent="true">
-      <app-toolbar>
-        <div title class="title">Finnkino Movies</div>
-      </app-toolbar>
-      <div class="filters-list">
-        <paper-input label="Search" value="{{filterValue}}" on-keyup="filterList" id="searchFilter"></paper-input>
-        <paper-button on-tap="toggleFilters" class="close-toast-button">Close filters</paper-button>
-      </div>
-    </app-drawer>
   </template>
 
   <script>
@@ -132,20 +97,12 @@
         xmlData: {},
         theatres: {},
         filteredTheatres: {},
-        filterValue: {
-          type: String
-        },
         theatresFetched: {
           type: Boolean,
           value: false
         },
-        routeData: {
-          type: Object,
-          observer: 'clearFilters'
-        },
-        filterTap: {
-          type: Boolean,
-          observer: 'toggleFilters'
+        filters: {
+          type: Object
         }
       },
 
@@ -159,12 +116,12 @@
       },
 
       filterList: function() {
-        if (this.filterValue.trim() == '') {
+        if (this.filters.search.trim() == '') {
           this.setFilteredTheathers(this.theatres);
         } else {
           var filteredList = [];
           this.theatres.forEach(function(value) {
-            if (value.Name.toLowerCase().indexOf(this.filterValue.toLowerCase()) > -1) {
+            if (value.Name.toLowerCase().indexOf(this.filters.search.toLowerCase()) > -1) {
               filteredList.push(value);
             }
           }.bind(this));
@@ -210,22 +167,8 @@
         return theatresFetched ? 'hide' : '';
       },
 
-      toggleFilters: function() {
-        this.$.filtersDrawer.opened ? this.closeFilters() : this.openFilters();
-      },
-
-      closeFilters: function() {
-        this.$.filtersDrawer.close();
-      },
-
-      openFilters: function() {
-        this.$.filtersDrawer.open();
-      },
-
-      clearFilters: function() {
-        this.filterValue = '';
+      filtersChanged: function() {
         this.filterList();
-        this.closeFilters();
       }
 
     });

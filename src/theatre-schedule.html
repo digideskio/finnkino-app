@@ -1,14 +1,9 @@
 <link rel="import" href="../bower_components/polymer/polymer.html">
 <link rel="import" href="../bower_components/iron-ajax/iron-ajax.html">
 <link rel="import" href="../bower_components/paper-button/paper-button.html">
-<link rel="import" href="../bower_components/paper-input/paper-input.html">
 <link rel="import" href="../bower_components/paper-progress/paper-progress.html">
 <link rel="import" href="../bower_components/iron-icons/iron-icons.html">
-<link rel="import" href="../bower_components/paper-toast/paper-toast.html">
 <link rel="import" href="../bower_components/paper-fab/paper-fab.html">
-<link rel="import" href="../bower_components/vaadin-date-picker/vaadin-date-picker.html">
-<link rel="import" href="../bower_components/vaadin-combo-box/vaadin-combo-box.html">
-<link rel="import" href="../bower_components/app-layout/app-toolbar/app-toolbar.html">
 
 <dom-module id="theatre-schedule">
 
@@ -52,17 +47,6 @@
         text-decoration: none;
       }
 
-      paper-input, vaadin-combo-box {
-        --paper-input-container-focus-color: var(--app-primary-color);
-        max-width: 840px;
-        margin: 0 auto 0;
-        --primar-color: var(--app-primary-color);
-      }
-
-      vaadin-combo-box-overlay {
-        --primar-color: var(--app-primary-color);
-      }
-
       .more {
         display: none;
       }
@@ -96,18 +80,6 @@
         --paper-fab-background: var(--paper-green-500);
       }
 
-      .filters {
-        max-height: 100px;
-        transition-property: all;
-        transition-duration: .5s;
-        transition-timing-function: cubic-bezier(0, 1, 0.5, 1);
-        overflow-y: hidden;
-      }
-
-      .filters.closed {
-        max-height: 0;
-      }
-
       .filter-fab {
         --paper-fab-background: var(--app-primary-color);
         position: fixed;
@@ -120,30 +92,8 @@
         color: var(--app-primary-color);
       }
 
-      .filters-list {
-        padding-left: 8px;
-        padding-right: 8px;
-      }
-
-      vaadin-date-picker {
-        --primary-color: var(--app-primary-color);
-      }
-
-      app-toolbar {
-        background-color: var(--app-primary-color);
-      }
-
       .title {
         color: white;
-      }
-
-      .back-button {
-        color: white;
-      }
-
-      app-drawer {
-        border-right: 1px solid;
-        border-color: #eeeeee;
       }
     </style>
 
@@ -168,26 +118,6 @@
         </div>
       </div>
     </template>
-
-    <paper-fab icon="icons:filter-list" title="Filters" on-tap="toggleFilters" class="filter-fab"></paper-fab>
-
-    <app-drawer id="filtersDrawer" persistent="true">
-      <app-toolbar>
-        <a href="/" class="back-button">
-          <paper-icon-button icon="arrow-back"></paper-icon-button>
-        </a>
-        <div title class="title">Finnkino Movies</div>
-      </app-toolbar>
-      <div class="filters-list">
-        <paper-input label="Search" value="{{filterValue}}" on-keyup="filterList" id="searchFilter"></paper-input>
-        <vaadin-date-picker value="{{filters.date}}" label="Date" id="datePicker"></vaadin-date-picker>
-        <vaadin-combo-box items="[[genres]]" item-label-path="eng" item-value-path="fin" label="Genre" id="comboBox" value="{{genre}}"></vaadin-combo-box>
-        <paper-button on-tap="toggleFilters" class="close-toast-button">Close filters</paper-button>
-      </div>
-    </app-drawer>
-    <paper-toast text="Loading..." id="loadingToast"></paper-toast>
-    <paper-toast text="Movies updated" id="updatedToast"></paper-toast>
-    <paper-toast text="No movies found" id="notFoundToast"></paper-toast>
 
   </template>
 
@@ -220,114 +150,25 @@
           type: Boolean,
           value: false
         },
-        showFilters: {
-          type: Boolean,
-          value: true
-        },
         filters: {
-          type: Object,
+          type: Object
+        },
+        oldDate: {
+          type: String
+        },
+        myApp: {
           value: function() {
-            var today = new Date();
-            return {
-              'date': today.toISOString().split('T')[0]
-            }
+            return document.querySelector('my-app');
           }
-        },
-        filterTap: {
-          type: Boolean,
-          observer: 'toggleFilters'
-        },
-        genres: {
-          type: Array,
-          readOnly: true,
-          value: function() {
-            return [{
-              eng: '3D',
-              fin: '3D'
-            }, {
-              eng: 'Action',
-              fin: 'Toiminta'
-            }, {
-              eng: 'Adventure',
-              fin: 'Seikkailu'
-            }, {
-              eng: 'Animation',
-              fin: 'Animaatio'
-            }, {
-              eng: 'Biography',
-              fin: 'Elämäkerta'
-            }, {
-              eng: 'Comedy',
-              fin: 'Komedia'
-            }, {
-              eng: 'Drama',
-              fin: 'Draama'
-            }, {
-              eng: 'Documentary',
-              fin: 'Dokumentti'
-            }, {
-              eng: 'Event cinema (not a movie)',
-              fin: 'Event cinema (ei elokuva)'
-            }, {
-              eng: 'Family movies',
-              fin: 'Perhe-elokuva'
-            }, {
-              eng: 'Fantasy',
-              fin: 'Fantasia'
-            }, {
-              eng: 'Finnish',
-              fin: 'Kotimainen'
-            }, {
-              eng: 'Romance',
-              fin: 'Romantiikka'
-            }, {
-              eng: 'Sci-fi',
-              fin: 'Sci-fi'
-            }, {
-              eng: 'Short movie',
-              fin: 'Lyhytelokuva'
-            }, {
-              eng: 'Sports',
-              fin: 'Urheilu'
-            }, {
-              eng: 'Swedish',
-              fin: 'Svenskt tal'
-            }, {
-              eng: 'Thriller',
-              fin: 'Jännitys'
-            }, {
-              eng: 'War',
-              fin: 'Sota'
-            }]
-          }
-        },
-        genre: {
-          type: String,
-          value: ''
         }
       },
 
       attached: function() {
-        this.addDateEventListener();
-        this.addGenreChangeListener();
-      },
-
-      addDateEventListener: function() {
-        this.$.datePicker.addEventListener('value-changed', function() {
-          this.scheduleFetched = false;
-          this.fetchSchedule();
-        }.bind(this));
-      },
-
-      addGenreChangeListener: function() {
-        this.$.comboBox.addEventListener('value-changed', function() {
-          this.filterList();
-        }.bind(this));
+        this.oldDate = this.filters.date;
       },
 
       routeChanged: function() {
         if (this.routeData.prefix === '/theatre-schedule' && this.routeData.path !== '') {
-          this.clearFilters();
           this.theatreId = this.routeData.path.substring(1);
           this.scheduleFetched = false;
           this.clearSchedule();
@@ -340,7 +181,7 @@
       },
 
       filterList: function() {
-        if (this.filterValue.trim() == '' && this.genre == '') {
+        if (this.filters.search.trim() == '' && this.filters.genre == '') {
           this.setFilteredShows(this.shows);
         } else {
           var filteredList = [];
@@ -353,14 +194,14 @@
               if (searchValue == '') {
                 return true;
               }
-              return searchValue.indexOf(this.filterValue.toLowerCase()) > -1;
+              return searchValue.indexOf(this.filters.search.toLowerCase()) > -1;
             }.bind(this);
 
             var checkGenre = function(genres) {
-              if (this.genre == '') {
+              if (this.filters.genre == '') {
                 return true;
               }
-              return genres.indexOf(this.genre) > -1;
+              return genres.indexOf(this.filters.genre) > -1;
             }.bind(this);
 
             if (checkSearch(value.OriginalTitle.toLowerCase()) && checkGenre(value.Genres)) {
@@ -380,7 +221,9 @@
       },
 
       fetchSchedule: function() {
-        this.$.loadingToast.show();
+        if (this.myApp) {
+          this.myApp.showToast('loading');
+        }
         this.async(function() {
 
           var dateArray = this.filters.date.split('-');
@@ -395,12 +238,16 @@
       xmlDataChanged: function() {
         var shows = this.xml2json(this.xmlData).Schedule.Shows.Show;
         if (shows) {
-          this.$.updatedToast.open();
+          if (this.myApp) {
+            this.myApp.showToast('updated');
+          }
           this.filteredShows = this.shows = this.filterFutureShows(shows);
           this.filterList();
         } else {
           this.filteredShows = this.shows = [];
-          this.$.notFoundToast.open();
+          if (this.myApp) {
+            this.myApp.showToast('not-found');
+          }
         }
         setTimeout(function() {
           this.scheduleFetched = true;
@@ -434,14 +281,6 @@
         return [dateString, time].join(' ');
       },
 
-      expandMore: function() {
-
-      },
-
-      expandLess: function() {
-
-      },
-
       xml2json: function(xml) {
         try {
           var obj = {};
@@ -471,24 +310,6 @@
         }
       },
 
-      toggleFilters: function() {
-        this.$.filtersDrawer.opened ? this.closeFilters() : this.openFilters();
-      },
-
-      closeFilters: function() {
-        this.$.filtersDrawer.close();
-      },
-
-      openFilters: function() {
-        this.$.filtersDrawer.open();
-      },
-
-      clearFilters: function() {
-        this.filterValue = '';
-        this.filterList();
-        this.closeFilters();
-      },
-
       moreIconTapped: function(e) {
         var fab = e.target;
         var index = fab.index;
@@ -500,6 +321,15 @@
         } else {
           item.classList.remove("expanded");
           fab.icon = 'expand-more'
+        }
+      },
+
+      filtersChanged: function() {
+        if (this.oldDate !== this.filters.date) {
+          this.oldDate = this.filters.date;
+          this.fetchSchedule();
+        } else {
+          this.filterList();
         }
       }
 
