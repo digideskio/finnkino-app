@@ -3,6 +3,7 @@
   "shell": "src/my-app.html",
   "fragments": [
     "src/movie-theatres.html",
-    "src/theatre-schedule.html"
+    "src/theatre-schedule.html",
+    "src/movie-filters.html"
   ]
 }
