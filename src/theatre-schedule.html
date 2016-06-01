@@ -141,13 +141,11 @@
                 </div>
               </div>
               <paper-fab mini icon="{{getIconForItem(item)}}" index="{{index}}" title="More" class="more-icon" on-tap="moreIconTapped"></paper-fab>
-              <paper-fab mini icon="add-shopping-cart" title="heart" class="buy-icon"></paper-fab>
+              <paper-fab mini icon="add-shopping-cart" title="Buy" class="buy-icon" on-tap="moveToFinnkino" url="{{item.ShowURL}}"></paper-fab>
 
             </div>
             <div class="more">
-              <a href="{{item.ShowURL}}" class="inherit">
-                ...more info...
-              </a>
+              ...more info...
             </div>
           </div>
         </div>
@@ -377,6 +375,10 @@
         } else {
           this.filterList();
         }
+      },
+
+      moveToFinnkino: function(e) {
+        this.myApp.openFinnkinoUrl(e.target.url);
       }
 
     });

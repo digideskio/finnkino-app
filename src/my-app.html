@@ -125,6 +125,11 @@
       <paper-button on-tap="_cancelGithub" class="close-toast-button">Cancel</paper-button>
     </paper-toast>
 
+
+    <paper-toast id="finnkinoUrlToast" text="[[finnkinoUrlMsg]]">
+      <paper-button on-tap="_cancelFinnkinoUrlOpen" class="close-toast-button">Cancel</paper-button>
+    </paper-toast>
+
     <!--<paper-fab icon="icons:filter-list" title="Filters" on-tap="openDrawer" class="filter-fab"></paper-fab>-->
 
     <paper-toast text="Loading..." id="loading"></paper-toast>
@@ -156,6 +161,15 @@
         },
 
         moveToGithub: {
+          type: Boolean,
+          value: true
+        },
+
+        finnkinoUrlMsg: {
+          type: String
+        },
+
+        moveToFinnkino: {
           type: Boolean,
           value: true
         },
@@ -248,7 +262,30 @@
         if(this.$[toastId]) {
           this.$[toastId].show();
         }
-      }
+      },
+
+      openFinnkinoUrl: function(url) {
+        this.finnkinoUrlMsg = 'Moving to Finnkino in 3';
+        this.$.finnkinoUrlToast.open();
+        var second = 2;
+        var moveInterval = setInterval(function() {
+          if (second === 0) {
+            clearInterval(moveInterval);
+            if (this.moveToFinnkino) {
+              window.location.href = url;
+            }
+            this.moveToFinnkino = true;
+          } else {
+            this.finnkinoUrlMsg = 'Moving to Finnkino in ' + second;
+          }
+          second--;
+        }.bind(this), 1000);
+      },
+
+      _cancelFinnkinoUrlOpen: function() {
+        this.$.finnkinoUrlToast.close();
+        this.moveToFinnkino = false;
+      },
 
     });
   </script>
