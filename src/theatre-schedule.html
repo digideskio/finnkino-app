@@ -58,6 +58,7 @@
       .more-icon {
         display: inline-block;
         --paper-fab-background: var(--app-primary-color);
+        float: right;
       }
 
       .inherit {
@@ -78,6 +79,7 @@
         display: inline-block;
         float: right;
         --paper-fab-background: var(--paper-green-500);
+        margin-right: 8px;
       }
 
       .filter-fab {
@@ -95,6 +97,29 @@
       .title {
         color: white;
       }
+
+      .circle {
+        display: inline-block;
+        width: 64px;
+        height: 64px;
+        border-radius: 50%;
+        background: #ddd;
+        line-height: 64px;
+        font-size: 18px;
+        color: #555;
+        text-align: center;
+      }
+
+      .item-title {
+        font-size: 20px;
+        display: inline-block;
+        vertical-align: middle;
+      }
+
+      .item-title-date {
+        font-size: 16px;
+        color: #ddd;
+      }
     </style>
 
 
@@ -106,12 +131,22 @@
         <div class$="{{getClassForItem(item)}}" tabindex$="[[tabIndex]]">
           <div class="pad">
             <div class="primary">
+              <div class="circle">
+                [[getJustTimeForItem(item.dttmShowStartUTC)]]
+              </div>
+              <div class="item-title">
+                {{item.OriginalTitle}}
+                <div class="item-title-date">
+                  [[getDateForItem(item.dttmShowStartUTC)]]
+                </div>
+              </div>
               <paper-fab mini icon="{{getIconForItem(item)}}" index="{{index}}" title="More" class="more-icon" on-tap="moreIconTapped"></paper-fab>
-              [[getTimeForItem(item.dttmShowStartUTC)]] {{item.OriginalTitle}}
+              <paper-fab mini icon="add-shopping-cart" title="heart" class="buy-icon"></paper-fab>
+
             </div>
             <div class="more">
               <a href="{{item.ShowURL}}" class="inherit">
-                <paper-fab mini icon="add-shopping-cart" title="heart" class="buy-icon"></paper-fab>
+                ...more info...
               </a>
             </div>
           </div>
@@ -274,11 +309,22 @@
         return item.selected ? 'expand-less' : 'expand-more';
       },
 
+      getJustTimeForItem: function(dttmShowStartUTC) {
+        var date = new Date(dttmShowStartUTC);
+        var time = date.getHours() + ':' + (('' + date.getMinutes()).length === 1 ? date.getMinutes() + '0' : date.getMinutes());
+        return time;
+      },
+
       getTimeForItem: function(dttmShowStartUTC) {
         var date = new Date(dttmShowStartUTC);
         var dateString = date.toISOString().split('T')[0];
         var time = date.getHours() + ':' + (('' + date.getMinutes()).length === 1 ? date.getMinutes() + '0' : date.getMinutes());
         return [dateString, time].join(' ');
+      },
+
+      getDateForItem: function(dttmShowStartUTC) {
+        var date = new Date(dttmShowStartUTC);
+        return date.toISOString().split('T')[0];
       },
 
       xml2json: function(xml) {
