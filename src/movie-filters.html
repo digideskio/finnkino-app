@@ -172,11 +172,7 @@
 
       clearFilters: function() {
         var today = new Date();
-        this.filters = {
-          'date': today.toISOString().split('T')[0],
-          'genre': '',
-          'search': ''
-        };
+        this.filters.genre = this.filters.search =  '';
       },
 
       getClassForExtraFilters: function(hideExtraFilters) {

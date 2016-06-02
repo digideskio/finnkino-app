@@ -152,6 +152,16 @@
       </div>
     </template>
 
+    <div class$="[[showNotFound(scheduleFetched, shows.length)]]">
+      <div class="item">
+        <div class="pad">
+          <div class="primary">
+            No movies found
+          </div>
+        </div>
+      </div>
+    </div>
+
   </template>
 
   <script>
@@ -211,6 +221,10 @@
 
       showLoading: function(scheduleFetched) {
         return scheduleFetched ? 'hide' : '';
+      },
+
+      showNotFound: function(scheduleFetched, showsLength) {
+        return (scheduleFetched && !showsLength) ? '' : 'hide';
       },
 
       filterList: function() {
