@@ -4,6 +4,7 @@
 <link rel="import" href="../bower_components/paper-progress/paper-progress.html">
 <link rel="import" href="../bower_components/iron-icons/iron-icons.html">
 <link rel="import" href="../bower_components/paper-fab/paper-fab.html">
+<link rel="import" href="../bower_components/iron-image/iron-image.html">
 
 <dom-module id="theatre-schedule">
 
@@ -32,6 +33,7 @@
 
       .pad {
         padding: 0 16px;
+        max-width: 96%;
         @apply(--layout-flex);
         @apply(--layout-vertical);
       }
@@ -120,6 +122,10 @@
         font-size: 16px;
         color: #ddd;
       }
+
+      iron-image {
+        max-width: 100%;
+      }
     </style>
 
 
@@ -145,7 +151,11 @@
 
             </div>
             <div class="more">
-              ...more info...
+              <ul>
+                <li>Location: {{item.TheatreAndAuditorium}}</li>
+                <li>Length: {{item.LengthInMinutes}} minutes</li>
+              </ul>
+              <iron-image placeholder-src="{{item.Images.EventLargeImageLandscape}}" alt="{{item.OriginalTitle}}" preload="false"/>
             </div>
           </div>
         </div>
@@ -284,6 +294,7 @@
 
       xmlDataChanged: function() {
         var shows = this.xml2json(this.xmlData).Schedule.Shows.Show;
+        console.log(shows[0]);
         if (shows) {
           if (this.myApp) {
             this.myApp.showToast('updated');
@@ -375,10 +386,18 @@
         var item = e.target.parentNode.parentNode.parentNode;
         if (this.filteredShows[index].selected) {
           item.classList.add("expanded");
-          fab.icon = 'expand-less'
+          fab.icon = 'expand-less';
+          this.addImageSrc(item);
         } else {
           item.classList.remove("expanded");
-          fab.icon = 'expand-more'
+          fab.icon = 'expand-more';
+        }
+      },
+
+      addImageSrc: function(item) {
+        var image = item.querySelector('iron-image');
+        if (!image.src) {
+          image.src = image.placeholderSrc;
         }
       },
 
