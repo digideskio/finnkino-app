@@ -415,7 +415,12 @@
       },
 
       moveToFinnkino: function(e) {
-        this.myApp.openFinnkinoUrl(e.target.url);
+        if (e.target.nodeName === 'IRON-ICON') {
+          var fab = e.target.parentNode;
+        } else {
+          var fab = e.target;
+        }
+        this.myApp.openFinnkinoUrl(fab.url);
       }
 
     });
