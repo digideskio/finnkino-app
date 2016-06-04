@@ -76,15 +76,11 @@
     <iron-ajax url="https://www.finnkino.fi/xml/TheatreAreas/" last-response="{{xmlData}}" auto handle-as="xml" id="ajax"></iron-ajax>
     <paper-progress indeterminate class$="[[showLoading(theatresFetched)]]"></paper-progress>
     <template is="dom-repeat" items="[[filteredTheatres]]">
-      <div>
-        <a href="/theatre-schedule/[[item.ID]]">
-          <div class="item" tabindex$="[[tabIndex]]">
-            <div class="pad">
-              <div class="primary">[[item.Name]]</div>
-            </div>
-          </div>
-        </a>
-      </div>
+      <a class="item" tabindex$="[[tabIndex]]" href="/theatre-schedule/[[item.ID]]">
+        <div class="pad">
+          <div class="primary">[[item.Name]]</div>
+        </div>
+      </a>
     </template>
   </template>
 
