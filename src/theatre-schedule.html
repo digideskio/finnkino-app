@@ -32,10 +32,10 @@
       }
 
       .pad {
-        padding: 0 16px;
-        max-width: 96%;
+        /*padding: 0 16px;*/
         @apply(--layout-flex);
         @apply(--layout-vertical);
+        max-width: 100%;
       }
 
       .primary {
@@ -57,12 +57,6 @@
         display: block;
       }
 
-      .more-icon {
-        display: inline-block;
-        --paper-fab-background: var(--app-primary-color);
-        float: right;
-      }
-
       .inherit {
         color: inherit;
         background-color: inherit;
@@ -79,16 +73,15 @@
 
       .buy-icon {
         display: inline-block;
-        float: right;
         --paper-fab-background: var(--paper-green-500);
         margin-right: 8px;
+        float: right;
       }
 
-      .filter-fab {
+      .more-icon {
+        display: inline-block;
         --paper-fab-background: var(--app-primary-color);
-        position: fixed;
-        bottom: 16px;
-        right: 16px;
+        float: right;
       }
 
       .close-toast-button {
@@ -146,16 +139,20 @@
                   [[getDateForItem(item.dttmShowStartUTC)]]
                 </div>
               </div>
-              <paper-fab mini icon="{{getIconForItem(item)}}" index="{{index}}" title="More" class="more-icon" on-tap="moreIconTapped"></paper-fab>
-              <paper-fab mini icon="add-shopping-cart" title="Buy" class="buy-icon" on-tap="moveToFinnkino" url="{{item.ShowURL}}"></paper-fab>
+              <div class="buttons">
+                <paper-fab mini icon="{{getIconForItem(item)}}" index="{{index}}" title="More" class="more-icon" on-tap="moreIconTapped"></paper-fab>
+                <paper-fab mini icon="add-shopping-cart" title="Buy" class="buy-icon" on-tap="moveToFinnkino" url="{{item.ShowURL}}"></paper-fab>
+              </div>
 
             </div>
             <div class="more">
-              <ul>
-                <li>Location: {{item.TheatreAndAuditorium}}</li>
-                <li>Length: {{item.LengthInMinutes}} minutes</li>
-              </ul>
-              <iron-image placeholder-src="{{item.Images.EventLargeImageLandscape}}" alt="{{item.OriginalTitle}}" preload="false"/>
+              <p>
+                Location: {{item.TheatreAndAuditorium}}
+              </p>
+              <p>
+                Length: {{item.LengthInMinutes}} minutes
+              </p>
+              <iron-image placeholder-src="{{item.Images.EventLargeImageLandscape}}" alt="{{item.OriginalTitle}}" preload="false" />
             </div>
           </div>
         </div>
@@ -387,7 +384,7 @@
         }
         var index = fab.index;
         this.filteredShows[index].selected = !this.filteredShows[index].selected;
-        var item = fab.parentNode.parentNode.parentNode;
+        var item = fab.parentNode.parentNode.parentNode.parentNode;
         if (this.filteredShows[index].selected) {
           item.classList.add("expanded");
           fab.icon = 'expand-less';
