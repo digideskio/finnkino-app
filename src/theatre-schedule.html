@@ -380,10 +380,14 @@
       },
 
       moreIconTapped: function(e) {
-        var fab = e.target;
+        if (e.target.nodeName === 'IRON-ICON') {
+          var fab = e.target.parentNode;
+        } else {
+          var fab = e.target;
+        }
         var index = fab.index;
         this.filteredShows[index].selected = !this.filteredShows[index].selected;
-        var item = e.target.parentNode.parentNode.parentNode;
+        var item = fab.parentNode.parentNode.parentNode;
         if (this.filteredShows[index].selected) {
           item.classList.add("expanded");
           fab.icon = 'expand-less';
