@@ -221,6 +221,9 @@
       attached: function() {
         this.oldDate = this.filters.date;
         this.theatreId = this.routeData.path.substring(1);
+
+        // Clear old values from localstorage
+        this.async(this.clearLocalStorageExtraValues, 3000);
       },
 
       routeChanged: function() {
@@ -470,7 +473,27 @@
       },
 
       clearLocalStorageExtraValues: function() {
-
+        var newData = {};
+        var yesterday = new Date();
+        yesterday.setDate(yesterday.getDate()-1);
+        if (this.scheduleLocalhost) {
+          for (var theatre in this.scheduleLocalhost) {
+            if (this.scheduleLocalhost.hasOwnProperty(theatre)) {
+              for (var date in this.scheduleLocalhost[theatre]) {
+                if (this.scheduleLocalhost[theatre].hasOwnProperty(date)) {
+                  var theatreDate = new Date(date);
+                  if (theatreDate.getTime() > yesterday.getTime()) {
+                    if (!newData[theatre]) {
+                      newData[theatre] = {};
+                    }
+                    newData[theatre][date] = this.scheduleLocalhost[theatre][date];
+                  }
+                }
+              }
+            }
+          }
+          this.scheduleLocalhost = newData;
+        }
       },
 
       fetchDataFromLocalStorage: function(theatreId, date) {
