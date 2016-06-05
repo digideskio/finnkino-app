@@ -5,6 +5,7 @@
 <link rel="import" href="../bower_components/iron-icons/iron-icons.html">
 <link rel="import" href="../bower_components/paper-fab/paper-fab.html">
 <link rel="import" href="../bower_components/iron-image/iron-image.html">
+<link rel="import" href="../bower_components/iron-localstorage/iron-localstorage.html">
 
 <dom-module id="theatre-schedule">
 
@@ -124,6 +125,7 @@
 
     <iron-ajax url="https://www.finnkino.fi/xml/Schedule/" last-response="{{xmlData}}" auto handle-as="xml" id="ajax" params="{{getParameters}}"></iron-ajax>
     <paper-progress indeterminate class$="[[showLoading(scheduleFetched)]]"></paper-progress>
+    <iron-localstorage name="schedules" value="{{scheduleLocalhost}}" id="ironStorage"></iron-localstorage>
 
     <template is="dom-repeat" items="{{filteredShows}}" id="showsTemplate">
       <div>
@@ -210,11 +212,15 @@
           value: function() {
             return document.querySelector('my-app');
           }
+        },
+        scheduleLocalhost: {
+          type: Object
         }
       },
 
       attached: function() {
         this.oldDate = this.filters.date;
+        this.theatreId = this.routeData.path.substring(1);
       },
 
       routeChanged: function() {
@@ -279,19 +285,26 @@
           this.myApp.showToast('loading');
         }
         this.async(function() {
-
-          var dateArray = this.filters.date.split('-');
-          var date = [dateArray[2], dateArray[1], dateArray[0]].join('.')
-          this.getParameters = {
-            area: this.theatreId,
-            dt: date
+          if (navigator.onLine) {
+            var dateArray = this.filters.date.split('-');
+            var date = [dateArray[2], dateArray[1], dateArray[0]].join('.')
+            this.getParameters = {
+              area: this.theatreId,
+              dt: date
+            }
+          } else {
+            this.xmlData = null;
+            this.xmlDataChanged();
           }
         });
       },
 
       xmlDataChanged: function() {
-        var shows = this.xml2json(this.xmlData).Schedule.Shows.Show;
-        console.log(shows[0]);
+        if (this.xmlData === null) {
+          var shows = null;
+        } else {
+          var shows = this.xml2json(this.xmlData).Schedule.Shows.Show;
+        }
         if (shows) {
           if (this.myApp) {
             this.myApp.showToast('updated');
@@ -299,13 +312,22 @@
           this.filteredShows = this.shows = this.filterFutureShows(shows);
           this.filterList();
         } else {
-          this.filteredShows = this.shows = [];
-          if (this.myApp) {
+
+          //offline
+          if (!navigator.onLine) {
+            this.shows = this.filteredShows = this.fetchDataFromLocalStorage(this.theatreId, this.filters.date)
+          } else {
+            this.filteredShows = this.shows = [];
+          }
+          if (this.myApp && this.shows.length > 0) {
+            this.myApp.showToast('updated');
+          } else if (this.myApp) {
             this.myApp.showToast('not-found');
           }
         }
         setTimeout(function() {
           this.scheduleFetched = true;
+          this.updateLocalStorage();
         }.bind(this), 1);
       },
 
@@ -418,6 +440,44 @@
           var fab = e.target;
         }
         this.myApp.openFinnkinoUrl(fab.url);
+      },
+
+      updateLocalStorage: function() {
+        var storage = {};
+        if (this.scheduleLocalhost !== null && Object.keys(this.scheduleLocalhost).length) {
+          storage = this.scheduleLocalhost;
+        }
+        if (!storage) {
+          storage = {};
+        }
+        if (!storage[this.theatreId]) {
+          storage[this.theatreId] = {};
+        }
+        if (!storage[this.theatreId][this.filters.date]) {
+          storage[this.theatreId][this.filters.date] = this.shows;
+        }
+        this.scheduleLocalhost = storage;
+        this.$.ironStorage.save();
+        /*
+        localstorage: {
+          theatreId: {
+            date: {
+              data
+            }
+          }
+        }
+        */
+      },
+
+      clearLocalStorageExtraValues: function() {
+
+      },
+
+      fetchDataFromLocalStorage: function(theatreId, date) {
+        if (this.scheduleLocalhost && this.scheduleLocalhost[theatreId] && this.scheduleLocalhost[theatreId][date]) {
+          return this.scheduleLocalhost[theatreId][date];
+        }
+        return [];
       }
 
     });
