@@ -1,6 +1,7 @@
 <link rel="import" href="../bower_components/polymer/polymer.html">
 <link rel="import" href="../bower_components/iron-ajax/iron-ajax.html">
 <link rel="import" href="../bower_components/paper-progress/paper-progress.html">
+<link rel="import" href="../bower_components/iron-localstorage/iron-localstorage.html">
 
 <dom-module id="movie-theatres">
 
@@ -72,7 +73,7 @@
         border-color: #eeeeee;
       }
     </style>
-
+    <iron-localstorage name="theatres" value="{{theatres}}"></iron-localstorage>
     <iron-ajax url="https://www.finnkino.fi/xml/TheatreAreas/" last-response="{{xmlData}}" auto handle-as="xml" id="ajax"></iron-ajax>
     <paper-progress indeterminate class$="[[showLoading(theatresFetched)]]"></paper-progress>
     <template is="dom-repeat" items="[[filteredTheatres]]">
@@ -109,6 +110,16 @@
           this.theatres = this.filteredTheatres = theatres;
           this.theatresFetched = true;
         }.bind(this));
+
+        //offline
+        if (!navigator.onLine) {
+          this.async(function(){
+            if (this.theatres) {
+              this.filteredTheatres = this.theatres;
+              this.theatresFetched = true;
+            }
+          });
+        }
       },
 
       filterList: function() {
