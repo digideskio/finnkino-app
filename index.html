@@ -1,5 +1,6 @@
 <!doctype html>
 <html lang="en">
+
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=yes">
@@ -8,13 +9,14 @@
 
   <link rel="shortcut icon" sizes="32x32" href="/images/app-icon-32.png">
 
-  <meta name="theme-color" content="#fff">
+  <meta name="theme-color" content="#F44336">
   <link rel="manifest" href="/manifest.json">
 
-
+  <meta name="description" content="Fetch Finnkino movie schedule">
+  <meta name="keywords" content="finnkino, movies, elokuva, elokuvateatteri">
+  <meta name="author" content="Sami Suo-Heikki">
 
   <style>
-
     body {
       margin: 0;
       font-family: 'Roboto', 'Noto', sans-serif;
@@ -22,24 +24,24 @@
       min-height: 100vh;
       background-color: #eee;
     }
-
   </style>
 
 </head>
+
 <body>
 
-  <my-app>My App</my-app>
+  <my-app>Finnkino Movies. Loading...</my-app>
 
   <script>
-
     // setup Polymer options
-    window.Polymer = {lazyRegister: true, dom: 'shadow'};
+    window.Polymer = {
+      lazyRegister: true,
+      dom: 'shadow'
+    };
 
     // load webcomponents polyfills
     (function() {
-      if ('registerElement' in document
-          && 'import' in document.createElement('link')
-          && 'content' in document.createElement('template')) {
+      if ('registerElement' in document && 'import' in document.createElement('link') && 'content' in document.createElement('template')) {
         // browser has web components
       } else {
         // polyfill web components
@@ -55,10 +57,10 @@
         navigator.serviceWorker.register('/service-worker.js');
       });
     }
-
   </script>
 
   <link rel="import" href="/src/my-app.html">
 
 </body>
+
 </html>
