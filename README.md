@@ -6,7 +6,7 @@
 ## Technologies used
 Polymer,
 Vaadin Elements,
-Finnkino API,
+Finnkino API
 
 =======
 
