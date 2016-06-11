@@ -154,7 +154,7 @@
               <p>
                 Length: {{item.LengthInMinutes}} minutes
               </p>
-              <iron-image placeholder-src="{{item.Images.EventLargeImageLandscape}}" alt="{{item.OriginalTitle}}" preload="false" />
+              <iron-image placeholder-src="{{item.EventLargeImageLandscape}}" alt="{{item.OriginalTitle}}" preload="false" />
             </div>
           </div>
         </div>
@@ -266,8 +266,8 @@
               }
               return genres.indexOf(this.filters.genre) > -1;
             }.bind(this);
-
-            if (checkSearch(value.OriginalTitle.toLowerCase()) && checkGenre(value.Genres)) {
+            // First one is stupid IE hack
+            if (typeof(value.OriginalTitle) === 'string' && checkSearch(value.OriginalTitle.toLowerCase()) && checkGenre(value.Genres)) {
               filteredList.push(value);
             }
           }.bind(this));
@@ -275,7 +275,7 @@
         }
       },
 
-      setFilteredShows(shows) {
+      setFilteredShows: function(shows) {
         this.filteredShows = shows;
       },
 
@@ -306,13 +306,38 @@
         if (this.xmlData === null) {
           var shows = null;
         } else {
-          var shows = this.xml2json(this.xmlData).Schedule.Shows.Show;
+          var shows = this.xml2json(this.xmlData.documentElement).Shows.Show;
         }
         if (shows) {
           if (this.myApp) {
             this.myApp.showToast('updated');
           }
-          this.filteredShows = this.shows = this.filterFutureShows(shows);
+
+          var realShows = [];
+
+          // Extremely stupid IE and Edge fix
+          shows.forEach(function(value, index){
+            var show = {};
+            show.ShowURL = value.ShowURL['#text'];
+            if (typeof(value.dttmShowStartUTC['#text']) === 'object') { // Fuck you IE, I hate you
+              show.dttmShowStartUTC = value.dttmShowStartUTC['#text'].join('');
+            } else { // Thank you every other browser in the world
+              show.dttmShowStartUTC = value.dttmShowStartUTC['#text'];
+            }
+            if (typeof(value.Genres['#text']) === 'object') { // Fuck you IE, I hate you
+              show.Genres = value.Genres['#text'].join('');
+            } else { // Thank you every other browser in the world
+              show.Genres = value.Genres['#text'];
+            }
+            show.OriginalTitle = value.OriginalTitle['#text'];
+            show.TheatreAndAuditorium = value.TheatreAndAuditorium['#text'];
+            show.LengthInMinutes = value.LengthInMinutes['#text'];
+            show.EventLargeImageLandscape = value.Images.EventLargeImageLandscape['#text'];
+            show.selected = false;
+
+            realShows.push(show);
+          });
+          this.filteredShows = this.shows = this.filterFutureShows(realShows);
           this.filterList();
         } else {
 
@@ -375,9 +400,9 @@
       xml2json: function(xml) {
         try {
           var obj = {};
-          if (xml.children.length > 0) {
-            for (var i = 0; i < xml.children.length; i++) {
-              var item = xml.children.item(i);
+          if (xml.childNodes.length > 0) {
+            for (var i = 0; i < xml.childNodes.length; i++) {
+              var item = xml.childNodes.item(i);
               var nodeName = item.nodeName;
 
               if (typeof(obj[nodeName]) == "undefined") {

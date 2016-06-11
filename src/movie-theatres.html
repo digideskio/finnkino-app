@@ -56,7 +56,6 @@
 
       .close-toast-button {
         text-transform: none;
-        /*color: var(--app-primary-color);*/
       }
 
       .title {
@@ -105,9 +104,19 @@
 
       attached: function() {
         this.$.ajax.addEventListener('response', function() {
-          var theatres = this.xml2json(this.xmlData).TheatreAreas.TheatreArea;
-          theatres.shift();
-          this.theatres = this.filteredTheatres = theatres;
+          var theatres = this.xml2json(this.xmlData.documentElement).TheatreArea;
+          var realTheatres = [];
+
+          // Stupid IE and Edge fix
+          theatres.forEach(function(value, index){
+            var theatre = {};
+            theatre.ID = value.ID['#text'];
+            theatre.Name = value.Name['#text'];
+            realTheatres.push(theatre);
+          });
+
+          realTheatres.shift();
+          this.theatres = this.filteredTheatres = realTheatres;
           this.theatresFetched = true;
         }.bind(this));
 
@@ -144,9 +153,9 @@
       xml2json: function(xml) {
         try {
           var obj = {};
-          if (xml.children.length > 0) {
-            for (var i = 0; i < xml.children.length; i++) {
-              var item = xml.children.item(i);
+          if (xml.childNodes.length > 0) {
+            for (var i = 0; i < xml.childNodes.length; i++) {
+              var item = xml.childNodes.item(i);
               var nodeName = item.nodeName;
 
               if (typeof(obj[nodeName]) == "undefined") {
