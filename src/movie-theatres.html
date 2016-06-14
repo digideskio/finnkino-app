@@ -103,7 +103,9 @@
       },
 
       attached: function() {
+        var response = false;
         this.$.ajax.addEventListener('response', function() {
+          response = true;
           var theatres = this.xml2json(this.xmlData.documentElement).TheatreArea;
           var realTheatres = [];
 
@@ -128,6 +130,14 @@
               this.theatresFetched = true;
             }
           });
+        } else {
+          var responseInterval = setInterval(function(){
+            if (!response) {
+              this.$.ajax.generateRequest();
+            } else {
+              clearInterval(responseInterval);
+            }
+          }.bind(this), 2000);
         }
       },
 
