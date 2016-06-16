@@ -73,7 +73,7 @@
       }
     </style>
     <iron-localstorage name="theatres" value="{{theatres}}"></iron-localstorage>
-    <iron-ajax url="https://www.finnkino.fi/xml/TheatreAreas/" last-response="{{xmlData}}" auto handle-as="xml" id="ajax"></iron-ajax>
+    <iron-ajax url="https://www.finnkino.fi/xml/TheatreAreas/" last-response="{{xmlData}}" auto handle-as="xml" id="ajax" on-response="onAjaxRequest"></iron-ajax>
     <paper-progress indeterminate class$="[[showLoading(theatresFetched)]]"></paper-progress>
     <template is="dom-repeat" items="[[filteredTheatres]]">
       <a class="item" tabindex$="[[tabIndex]]" href="/theatre-schedule/[[item.ID]]">
@@ -103,25 +103,6 @@
       },
 
       attached: function() {
-        var response = false;
-        this.$.ajax.addEventListener('response', function() {
-          response = true;
-          var theatres = this.xml2json(this.xmlData.documentElement).TheatreArea;
-          var realTheatres = [];
-
-          // Stupid IE and Edge fix
-          theatres.forEach(function(value, index){
-            var theatre = {};
-            theatre.ID = value.ID['#text'];
-            theatre.Name = value.Name['#text'];
-            realTheatres.push(theatre);
-          });
-
-          realTheatres.shift();
-          this.theatres = this.filteredTheatres = realTheatres;
-          this.theatresFetched = true;
-        }.bind(this));
-
         //offline
         if (!navigator.onLine) {
           this.async(function(){
@@ -130,15 +111,24 @@
               this.theatresFetched = true;
             }
           });
-        } else {
-          var responseInterval = setInterval(function(){
-            if (!response) {
-              this.$.ajax.generateRequest();
-            } else {
-              clearInterval(responseInterval);
-            }
-          }.bind(this), 2000);
         }
+      },
+
+      onAjaxRequest: function(a) {
+        var theatres = this.xml2json(this.xmlData.documentElement).TheatreArea;
+        var realTheatres = [];
+
+        // Stupid IE and Edge fix
+        theatres.forEach(function(value, index){
+          var theatre = {};
+          theatre.ID = value.ID['#text'];
+          theatre.Name = value.Name['#text'];
+          realTheatres.push(theatre);
+        });
+
+        realTheatres.shift();
+        this.theatres = this.filteredTheatres = realTheatres;
+        this.theatresFetched = true;
       },
 
       filterList: function() {
