@@ -123,7 +123,7 @@
     </style>
 
 
-    <iron-ajax url="https://www.finnkino.fi/xml/Schedule/" last-response="{{xmlData}}" auto handle-as="xml" id="ajax" params="{{getParameters}}"></iron-ajax>
+    <iron-ajax url="https://www.finnkino.fi/xml/Schedule/" last-response="{{xmlData}}" auto handle-as="xml" id="ajax" params="{{getParameters}}" on-response="onAjaxRequest"></iron-ajax>
     <paper-progress indeterminate class$="[[showLoading(scheduleFetched)]]"></paper-progress>
     <iron-localstorage name="schedules" value="{{scheduleLocalhost}}" id="ironStorage"></iron-localstorage>
 
@@ -526,6 +526,15 @@
           return this.scheduleLocalhost[theatreId][date];
         }
         return [];
+      },
+
+      onAjaxRequest: function() {
+        try {
+          var appDrawerLayout = this.parentNode.parentNode.parentNode;
+          appDrawerLayout.querySelector('app-drawer').resetLayout();
+          appDrawerLayout.querySelector('app-header').resetLayout();
+        } catch (e) {
+        }
       }
 
     });
