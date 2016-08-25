@@ -95,7 +95,8 @@
         filteredTheatres: {},
         theatresFetched: {
           type: Boolean,
-          value: false
+          value: false,
+          observer: 'theatresFetchedChanged'
         },
         filters: {
           type: Object
@@ -129,14 +130,6 @@
         realTheatres.shift();
         this.theatres = this.filteredTheatres = realTheatres;
         this.theatresFetched = true;
-
-        try {
-          var appDrawerLayout = this.parentNode.parentNode.parentNode;
-          appDrawerLayout.querySelector('app-drawer').resetLayout();
-          appDrawerLayout.querySelector('app-header').resetLayout();
-        } catch (e) {
-        }
-
       },
 
       filterList: function() {
@@ -193,6 +186,15 @@
 
       filtersChanged: function() {
         this.filterList();
+      },
+
+      theatresFetchedChanged: function() {
+        try {
+          var appDrawerLayout = this.parentNode.parentNode.parentNode;
+          appDrawerLayout.querySelector('app-drawer').resetLayout();
+          appDrawerLayout.querySelector('app-header').resetLayout();
+        } catch (e) {
+        }
       }
 
     });
